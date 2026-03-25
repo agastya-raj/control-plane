@@ -4,48 +4,57 @@ Walk the user through onboarding a server into the infrastructure mesh. This ski
 
 ## Prerequisites
 
-The server must already be registered in the control-plane registry (`registry/servers.yaml`). If not, run `protocols/discover_server.md` and `protocols/register_server.md` first.
+The server must already be registered in the control-plane registry (`registry/servers.yaml`). If not, run discovery and registration first:
+1. `protocols/discover_server.md` — automated audit
+2. Triage with user — review report, decide what to register
+3. `protocols/register_server.md` — add confirmed items to registry
+
+Verify registration: check that the server key exists in `registry/servers.yaml`.
 
 ## Flow
 
 ### Step 1: Run install.sh
 
-Check if `~/.stack/infra/` already exists on the target server. If not, run the install script:
+Check if `~/.stack/infra/` already exists on the target server:
+```bash
+ssh <server_alias> "test -d ~/.stack/infra && echo 'already installed' || echo 'needs install'"
+```
 
+If not installed, run:
 ```bash
 ssh <server_alias> "curl -fsSL https://raw.githubusercontent.com/agastya-raj/control-plane/main/sync/install.sh | bash"
 ```
 
-Or if the server doesn't have internet access to GitHub:
+If the server can't reach GitHub, copy the entire repo:
 ```bash
-scp sync/install.sh <server_alias>:/tmp/install.sh
-ssh <server_alias> "bash /tmp/install.sh"
+rsync -az ~/code/control-plane/ <server_alias>:/tmp/control-plane/
+ssh <server_alias> "bash /tmp/control-plane/sync/install.sh --repo /tmp/control-plane"
 ```
 
-Verify install succeeded by checking the output. All health checks should pass.
+Verify install succeeded — all health checks should pass.
 
 ### Step 2: Install Claude Code (user-assisted)
 
 Ask the user: "Do you want to install Claude Code on this server?"
 
-If yes, guide them:
-1. SSH into the server: `ssh <server_alias>`
-2. Install Claude Code: `curl -fsSL https://claude.ai/install.sh | sh`
-3. Authenticate: `claude login` (requires browser or API key — user must do this)
-4. Verify: `claude --version`
-
-If the server already has Claude Code, skip this step.
+If yes:
+1. Check if already installed: `ssh <server_alias> "which claude 2>/dev/null && claude --version || echo 'not installed'"`
+2. If not installed, tell the user to SSH in and install it following the official Anthropic docs
+3. Authentication requires browser or API key — the user must do this themselves
+4. Verify: `ssh <server_alias> "claude --version"`
+5. Update `registry/servers.yaml` — add `claude_code` to capabilities
 
 ### Step 3: Install Codex (user-assisted)
 
 Ask the user: "Do you want to install Codex on this server?"
 
-If yes, guide them:
-1. Install Codex: `npm install -g @openai/codex` (requires Node.js)
-2. Authenticate: the user handles API key setup
-3. Verify: `codex --version`
+If yes:
+1. Check if already installed: `ssh <server_alias> "which codex 2>/dev/null || echo 'not installed'"`
+2. If not installed, tell the user to SSH in and install it following the official OpenAI docs
+3. Authentication — the user handles API key setup
+4. Verify: `ssh <server_alias> "codex --version"`
 
-If Node.js isn't installed, note that it's needed and let the user decide whether to install it.
+Note: Codex requires Node.js. If Node.js isn't installed, let the user know and ask if they want to install it first.
 
 ### Step 4: Install Eternal Terminal (user-assisted)
 
@@ -58,6 +67,7 @@ If yes, guide them:
 2. Verify the ET daemon is running: `systemctl is-active etserver` (Linux)
 3. Test from Mac: `et <server_alias>`
 4. Verify persistence: connect via ET, sleep Mac briefly, verify session survives
+5. Update `registry/servers.yaml` — add `et` to capabilities
 
 ET is recommended for servers you connect to frequently. Skip for rarely-used servers.
 
@@ -86,10 +96,10 @@ Update the server's registry entry if new capabilities were added (Claude Code, 
 ### Summary
 
 Print what was done:
-- install.sh: ✓/✗
-- Claude Code: ✓/skipped
-- Codex: ✓/skipped
-- ET: ✓/skipped
+- install.sh: passed / issues
+- Claude Code: installed / skipped
+- Codex: installed / skipped
+- ET: installed / skipped
 - Health check: all passing / N issues
 
 Remind the user: "All new apps deployed to this server must be registered via `protocols/register_app.md`."
