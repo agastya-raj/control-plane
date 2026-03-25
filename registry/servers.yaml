@@ -17,6 +17,7 @@ schema_version: 1
 #     ssh_alias: "gpu"                  # Host entry in ~/.ssh/config
 #     tailscale_ip: "100.72.107.96"     # output of `tailscale ip -4`
 #     user: "agastya"                   # default SSH user
+#     os: "Ubuntu 24.04 LTS"           # OS/distro (from lsb_release or sw_vers)
 #
 #     # ── Role + Status (required) ───────────────────────────────────────────
 #     roles:                            # what this server is used for
@@ -86,6 +87,7 @@ servers:
     ssh_alias: "gpu"
     tailscale_ip: "100.72.107.96"
     user: "agastya"
+    os: "Ubuntu 24.04 LTS"
 
     roles:
       - compute
@@ -134,5 +136,40 @@ servers:
         port: null
 
     notes: "Primary GPU workstation. Runs homelab services behind Caddy (*.sudosu.fyi). Many legacy Docker containers still running — cleanup pending."
+    added: "2026-03-25"
+    last_audit: "2026-03-25"
+
+  claude:
+    hostname: "claude-server"
+    ssh_alias: "claude"
+    tailscale_ip: "100.110.125.66"
+    user: "claude"
+    os: "Ubuntu 24.04 LTS"
+
+    roles:
+      - sandbox
+    status: active
+
+    gateway: null
+    ports: []
+    domain: null
+
+    capabilities:
+      - tailscale
+      - docker
+
+    hardware:
+      cpu: "Intel Core i7-8650U"
+      cores: 4
+      threads: 4
+      ram_gb: 15
+      disk_gb: 229
+
+    services:
+      - name: "docker"
+        type: systemd
+        port: null
+
+    notes: "Dedicated sandbox server for Claude agents. Fresh install, no apps deployed. Has Node.js v22, Python 3.12, Rust/Cargo. ~/projects/ and ~/scratch/ prepared for use."
     added: "2026-03-25"
     last_audit: "2026-03-25"

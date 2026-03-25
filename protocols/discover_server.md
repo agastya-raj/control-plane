@@ -19,6 +19,10 @@ SSH into the server and collect:
 hostname                      # → hostname
 tailscale ip -4               # → tailscale_ip
 whoami                        # → user
+
+# OS version
+lsb_release -ds 2>/dev/null || cat /etc/os-release 2>/dev/null | head -2  # Linux
+# or: sw_vers                 # macOS
 ```
 
 Record the SSH alias you used to connect (the `Host` entry in `~/.ssh/config`).
@@ -51,18 +55,20 @@ df -h /
 
 ### 3. Check capabilities
 
-Run each check and note which are present:
+For each capability, check two things: (1) is the binary/package **installed**? (2) is the service **running**? Report both — "installed but stopped" is different from "not installed."
 
-| Capability | Check command |
-|------------|--------------|
-| docker | `docker ps` (runs without error) |
-| caddy | `systemctl is-active caddy` or `caddy version` |
-| ollama | `systemctl is-active ollama` or `ollama --version` |
-| jupyter | `systemctl is-active jupyter` or `jupyter --version` |
-| claude_code | `claude --version` |
-| symphony | `test -f ~/.symphony/projects.json` |
-| et | `which et` or `which etserver` |
-| tailscale | `tailscale status` (should always be present) |
+| Capability | Installed? | Running? |
+|------------|-----------|---------|
+| docker | `which docker` | `docker ps` (no error) |
+| caddy | `which caddy` | `systemctl is-active caddy` returns "active" |
+| ollama | `which ollama` | `systemctl is-active ollama` returns "active" |
+| jupyter | `which jupyter` | `systemctl is-active jupyter` returns "active" |
+| claude_code | `which claude` | `claude --version` |
+| symphony | `test -f ~/.symphony/projects.json` | — |
+| et | `which et` or `which etserver` | — |
+| tailscale | `which tailscale` | `tailscale status` (no error) |
+
+Only mark a capability as present if the binary is installed **and** the service is running (where applicable). Note installed-but-stopped items separately in the report — they may be relevant for onboarding decisions.
 
 ### 4. Discover services
 
@@ -89,7 +95,22 @@ On macOS:
 docker ps --format '{{.Names}}\t{{.Ports}}\t{{.Status}}' 2>/dev/null
 ```
 
-### 5. Discover repos
+### 5. Check installed runtimes
+
+Check for common language runtimes and tools beyond the core capabilities:
+
+```bash
+python3 --version 2>/dev/null
+node --version 2>/dev/null
+go version 2>/dev/null
+rustc --version 2>/dev/null
+java --version 2>/dev/null
+uv --version 2>/dev/null
+```
+
+Note which are present — useful for understanding what the server can run and for future deployments.
+
+### 6. Discover repos
 
 On Linux:
 ```bash
@@ -108,7 +129,7 @@ find ~/code -maxdepth 3 -name '.git' -type d 2>/dev/null | sed 's/\/.git$//' | w
 done
 ```
 
-### 6. Check Caddy config (if Caddy is present)
+### 7. Check Caddy config (if Caddy is present)
 
 **Warning:** Caddy configs may contain secrets (API tokens, auth credentials) in environment variable references or inline values. When including Caddy config in the discovery report, **summarize the routing rules only** (which subdomains point where). Do not include the full config verbatim.
 
@@ -129,6 +150,7 @@ Present all gathered data to the user in a structured format:
 - Tailscale IP: ...
 - User: ...
 - SSH alias: ...
+- OS: ... (e.g., "Ubuntu 24.04 LTS" or "macOS 15.3")
 
 ### Hardware
 - CPU: ... (X cores, Y threads)
@@ -137,7 +159,13 @@ Present all gathered data to the user in a structured format:
 - GPU: ... (X GB VRAM)  [or "None"]
 
 ### Capabilities
-[list of confirmed capabilities]
+[list of confirmed capabilities — installed AND running]
+
+### Installed but stopped
+[list any capabilities where binary exists but service is inactive]
+
+### Runtimes
+[list of detected language runtimes and versions]
 
 ### Running Services
 #### Docker Containers

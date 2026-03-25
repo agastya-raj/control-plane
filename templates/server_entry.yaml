@@ -11,6 +11,7 @@
   ssh_alias: "<SSH_ALIAS>"              # Host entry in ~/.ssh/config
   tailscale_ip: "<TAILSCALE_IP>"        # output of `tailscale ip -4`
   user: "<USERNAME>"                    # default SSH user
+  os: "<OS_VERSION>"                    # e.g., "Ubuntu 24.04 LTS", "macOS 15.3"
 
   # ── Role + Status (required) ──
   roles: []                              # pick all that apply (replace [] with list):
