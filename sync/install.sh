@@ -29,6 +29,10 @@ HAS_ERRORS=false
 while [[ $# -gt 0 ]]; do
     case "$1" in
         --repo)
+            if [[ $# -lt 2 ]]; then
+                echo "Error: --repo requires a URL argument"
+                exit 1
+            fi
             REPO_URL="$2"
             shift 2
             ;;
@@ -135,17 +139,27 @@ if [[ ! -d "$SKILLS_DIR" ]]; then
 fi
 
 if [[ -d "$INFRA_DIR/skills" ]]; then
+    FOUND_SKILLS=false
     for skill in "$INFRA_DIR/skills"/*/; do
+        # Guard against empty glob (no subdirectories)
+        [[ -d "$skill" ]] || continue
+        FOUND_SKILLS=true
         skill_name=$(basename "$skill")
         if [[ -L "$SKILLS_DIR/$skill_name" ]]; then
             info "Skill '$skill_name' already symlinked"
         elif [[ -e "$SKILLS_DIR/$skill_name" ]]; then
             warn "Skill '$skill_name' exists but is not a symlink — skipping"
         else
-            ln -sf "$skill" "$SKILLS_DIR/$skill_name"
-            info "Skill '$skill_name' symlinked"
+            if ln -sf "$skill" "$SKILLS_DIR/$skill_name" 2>/dev/null; then
+                info "Skill '$skill_name' symlinked"
+            else
+                warn "Failed to symlink skill '$skill_name'"
+            fi
         fi
     done
+    if [[ "$FOUND_SKILLS" == "false" ]]; then
+        info "skills/ directory is empty — no skills to symlink"
+    fi
 else
     info "No skills/ directory in infra — skipping skill symlinks"
 fi
