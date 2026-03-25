@@ -66,10 +66,9 @@ curl -s -o /dev/null -w "%{http_code}" http://localhost:<port>/health
 
 Note the endpoint URL (e.g., `https://myapp.sudosu.fyi`) and whether it's behind Caddy.
 
-If behind Caddy, check the subdomain mapping. **Warning:** Caddy configs may contain secrets — only note the hostname and reverse_proxy target, not full config blocks.
-```bash
-sudo grep -E '(host |reverse_proxy )' /etc/caddy/Caddyfile /etc/caddy/apps.caddy 2>/dev/null | grep -i '<appname>'
-```
+If behind Caddy, check the subdomain mapping. **Warning:** Caddy configs may contain secrets (API tokens, auth credentials). Only note the hostname and reverse_proxy target — do not paste full config blocks.
+
+Inspect the Caddy config manually and note which subdomain routes to which port. The config is typically at `/etc/caddy/Caddyfile` with app routes in `/etc/caddy/apps.caddy`.
 
 **For apps that listen on a port but don't have a Caddy subdomain yet:**
 - Set `endpoint` to `null` (no public URL yet)

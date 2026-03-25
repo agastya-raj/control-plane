@@ -55,7 +55,7 @@ df -h /
 
 ### 3. Check capabilities
 
-For each capability, check two things: (1) is the binary/package **installed**? (2) is the service **running**? Report both — "installed but stopped" is different from "not installed."
+For each capability, check two things: (1) is the binary/package **installed**? (2) is the service **running**?
 
 | Capability | Installed? | Running? |
 |------------|-----------|---------|
@@ -68,7 +68,7 @@ For each capability, check two things: (1) is the binary/package **installed**? 
 | et | `which et` or `which etserver` | — |
 | tailscale | `which tailscale` | `tailscale status` (no error) |
 
-Only mark a capability as present if the binary is installed **and** the service is running (where applicable). Note installed-but-stopped items separately in the report — they may be relevant for onboarding decisions.
+**Capabilities reflect what's installed**, not what's currently running. A server with Docker installed but temporarily stopped still has the `docker` capability. Report running status separately in the report so the user knows the current state.
 
 ### 4. Discover services
 
@@ -164,11 +164,11 @@ Present all gathered data to the user in a structured format:
 - Disk: X GB
 - GPU: ... (X GB VRAM)  [or "None"]
 
-### Capabilities
-[list of confirmed capabilities — installed AND running]
+### Capabilities (installed)
+[list of all installed capabilities — these go in servers.yaml]
 
-### Installed but stopped
-[list any capabilities where binary exists but service is inactive]
+### Running Status
+[for each capability, note if it's currently running or stopped]
 
 ### Runtimes
 [list of detected language runtimes and versions]
