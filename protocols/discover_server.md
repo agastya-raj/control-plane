@@ -129,7 +129,7 @@ done
 
 On macOS:
 ```bash
-find ~/code ~/.stack -maxdepth 3 -name '.git' -type d 2>/dev/null | sed 's/\/.git$//' | while read -r repo; do
+find ~/code ~/.stack ~/ad_hoc -maxdepth 3 -name '.git' -type d 2>/dev/null | sed 's/\/.git$//' | while read -r repo; do
   remote=$(git -C "$repo" remote get-url origin 2>/dev/null || echo "no remote")
   echo "$repo → $remote"
 done

@@ -120,20 +120,13 @@ All connected via Tailscale.
 **Goal:** Any agent on any server is instantly oriented — knows all servers, apps, repos, and how to reach them.
 
 **Deliverables:**
-- Git repo at ~/.stack/infra/, GitHub-backed (github.com/agastya/control-plane)
-- Registry files:
-  - servers.yaml — all servers with capabilities, Tailscale IPs, roles, gateway info
-  - apps.yaml — all deployed apps with endpoints, deploy info, status
-  - repos.yaml — all repos with GitHub URLs, local paths per server, classification
-- CLAUDE.md — agent entry point ("read this first on any server")
-- Sync mechanism:
-  - Mac is primary writer
-  - GitHub is the hub
-  - GPU server pulls via cron (every 5 min)
-  - install.sh script for onboarding new servers
-- Eternal Terminal:
-  - Install ET on Mac + GPU
-  - Verify et <server> works for all registered servers
+- Git repo for control-plane, GitHub-backed (github.com/agastya/control-plane)
+- Registry schemas and entry templates (servers, apps, repos)
+- Registration protocols (provision, discover, register)
+- CLAUDE.md + infra.md — agent entry points
+- Two servers onboarded (GPU, claude-server) as protocol validation
+
+*Note: sync mechanism (install.sh, cron), ET, and ~/.stack/ deployment moved to Phase 3.*
 - Claude Code config sync:
   - ~/.stack/infra/CLAUDE.md symlinked to ~/.claude/CLAUDE.md on each server
   - Shared skills directory (empty for now, populated in Phase 3)
