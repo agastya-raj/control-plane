@@ -64,7 +64,7 @@ For each capability, check two things: (1) is the binary/package **installed**? 
 | ollama | `which ollama` | `systemctl is-active ollama` returns "active" |
 | jupyter | `which jupyter` | `systemctl is-active jupyter` returns "active" |
 | claude_code | `which claude` | `claude --version` |
-| symphony | `test -f ~/.symphony/projects.json` | — |
+| symphony | `test -f ~/.stack/symphony/projects.json` or `test -f ~/.symphony/projects.json` | — |
 | et | `which et` or `which etserver` | — |
 | tailscale | `which tailscale` | `tailscale status` (no error) |
 
@@ -129,7 +129,7 @@ done
 
 On macOS:
 ```bash
-find ~/code -maxdepth 3 -name '.git' -type d 2>/dev/null | sed 's/\/.git$//' | while read -r repo; do
+find ~/code ~/.stack ~/ad_hoc -maxdepth 3 -name '.git' -type d 2>/dev/null | sed 's/\/.git$//' | while read -r repo; do
   remote=$(git -C "$repo" remote get-url origin 2>/dev/null || echo "no remote")
   echo "$repo → $remote"
 done
