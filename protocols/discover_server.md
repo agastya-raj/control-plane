@@ -6,9 +6,8 @@ Gather all information about a server before onboarding. This protocol produces 
 
 ## Prerequisites
 
-- SSH access to the target server from Mac (via Tailscale)
-- The server has Tailscale installed and connected
-- An SSH alias configured in `~/.ssh/config` on Mac (e.g., `Host gpu`)
+- Server has been provisioned (`protocols/provision_server.md` checklist complete)
+- SSH access works from Mac: `ssh <alias> hostname`
 
 ## Steps
 

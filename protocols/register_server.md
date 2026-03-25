@@ -2,7 +2,10 @@
 
 Add a server and its confirmed apps to the control-plane registry.
 
-**Prerequisite:** Run `protocols/discover_server.md` first to gather data. The user must have reviewed the discovery report and decided which apps and repos to register.
+**Prerequisites:**
+1. Server provisioned (`protocols/provision_server.md`)
+2. Discovery report generated (`protocols/discover_server.md`)
+3. User has reviewed the report and decided which apps/repos to register
 
 **This protocol takes confirmed decisions as input.** All edits happen on Mac. Passwordless sudo is available on all servers if you need to re-check anything.
 

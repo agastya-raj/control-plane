@@ -64,6 +64,7 @@ cd ~/.agastya && git log --oneline -10
 
 | Task | Protocol |
 |------|----------|
+| Provision a new server | `protocols/provision_server.md` (checklist with user) |
 | Discover a server | `protocols/discover_server.md` (automated audit) |
 | Register a server | `protocols/register_server.md` (after discovery + user triage) |
 | Register an app | `protocols/register_app.md` |
