@@ -132,7 +132,15 @@ else
     CLAUDE_MD="$CLAUDE_DIR/CLAUDE.md"
     # Resolve symlinks so file operations work on the real file
     if [[ -L "$CLAUDE_MD" ]]; then
-        CLAUDE_MD_REAL=$(readlink -f "$CLAUDE_MD" 2>/dev/null || readlink "$CLAUDE_MD" 2>/dev/null || true)
+        # Try GNU readlink -f first, fall back to resolving relative path manually
+        CLAUDE_MD_REAL=$(readlink -f "$CLAUDE_MD" 2>/dev/null || true)
+        if [[ -z "$CLAUDE_MD_REAL" ]]; then
+            # BSD readlink returns relative path — resolve relative to parent dir
+            local_target=$(readlink "$CLAUDE_MD" 2>/dev/null || true)
+            if [[ -n "$local_target" ]]; then
+                CLAUDE_MD_REAL="$CLAUDE_DIR/$local_target"
+            fi
+        fi
         if [[ -z "$CLAUDE_MD_REAL" || ! -f "$CLAUDE_MD_REAL" ]]; then
             warn "CLAUDE.md symlink is broken — removing and creating fresh"
             rm -f "$CLAUDE_MD"
@@ -152,14 +160,14 @@ else
             rm -f "$CLAUDE_MD_REAL.tmp"
             warn "Failed to update CLAUDE.md injection"
         fi
-    elif [[ -f "$CLAUDE_MD" ]]; then
+    elif [[ -f "$CLAUDE_MD_REAL" ]]; then
         # CLAUDE.md exists but no injection yet — append
-        echo "" >> "$CLAUDE_MD"
-        cat "$INJECT_FILE" >> "$CLAUDE_MD"
+        echo "" >> "$CLAUDE_MD_REAL"
+        cat "$INJECT_FILE" >> "$CLAUDE_MD_REAL"
         info "Stack pointers injected into existing CLAUDE.md"
     else
         # No CLAUDE.md — create with just the injection
-        cat "$INJECT_FILE" > "$CLAUDE_MD"
+        cat "$INJECT_FILE" > "$CLAUDE_MD_REAL"
         info "CLAUDE.md created with stack pointers"
     fi
 fi
