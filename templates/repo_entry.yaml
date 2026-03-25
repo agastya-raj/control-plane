@@ -22,7 +22,7 @@
 
   # ── Classification (required) ──
   language: "<LANGUAGE>"                # python | go | swift | js | yaml | mixed
-  category: infra                       # infra | research | tools | personal
+  category: infra                       # infra | research | tools | project | personal
   status: active                        # active | archived | stale
 
   # ── Metadata ──

@@ -11,8 +11,10 @@ registry/
   repos.yaml       All repos — GitHub URLs, local paths per server
 
 protocols/
-  register_server.md   How to onboard a new server
-  register_app.md      How to register an app
+  provision_server.md  Checklist for preparing a new server (Tailscale, SSH, basics)
+  discover_server.md   Automated server audit — produces a discovery report
+  register_server.md   Register a server + confirmed apps/repos from the report
+  register_app.md      Register an individual app (post-onboarding)
   agent_orientation.md What to do first on any server
 
 templates/
@@ -27,6 +29,7 @@ templates/
 - **GitHub is the hub.** Servers pull changes via cron (every 5 min).
 - **Servers are read-only.** They never push — this prevents conflicts.
 - **Git is the source of truth.** Everything is auditable, versionable, works offline.
+- **The registry is the law.** If an app or server is not in the registry, it does not exist. All new deployments must be registered via the protocols.
 
 ## Registry overview
 
@@ -56,7 +59,7 @@ Apps.yaml is the single source of truth for deployment mapping.
 
 Every important repo is tracked with:
 - GitHub URL and local clone paths per server
-- Language and category (infra, research, tools, personal)
+- Language and category (infra, research, tools, project, personal)
 
 Repos.yaml tracks where code lives. Deployment info (which server, which app) lives in apps.yaml.
 
@@ -73,7 +76,7 @@ Repos.yaml tracks where code lives. Deployment info (which server, which app) li
 
 | I want to... | Do this |
 |--------------|---------|
-| Onboard a new server | Follow `protocols/register_server.md` |
+| Onboard a new server | 1. `provision_server.md` (checklist) → 2. `discover_server.md` (audit) → 3. triage with user → 4. `register_server.md` → 5. `install.sh` *(Phase 3)* |
 | Register an app | Follow `protocols/register_app.md` |
 | Orient on a server | Follow `protocols/agent_orientation.md` |
 | Find what's on a server | Read `registry/apps.yaml`, find entries where `server: "<name>"` |

@@ -2,7 +2,7 @@
 
 Add a deployed application to the control-plane registry so agents know it exists, where it runs, and how to interact with it.
 
-**Important:** All registry edits happen on Mac and push to GitHub. Steps 1-3 gather information from the target server via SSH. Steps 4-7 are done on Mac.
+**Important:** All registry edits happen on Mac and push to GitHub. Steps 1-3 gather information from the target server via SSH. Steps 4-7 are done on Mac. Passwordless sudo is available on all servers.
 
 ## Prerequisites
 
@@ -25,8 +25,11 @@ SSH into the server and collect details based on deploy method:
 
 **For docker-compose apps:**
 ```bash
-# Find the compose file
-find /home -maxdepth 4 -name 'docker-compose.yml' -o -name 'compose.yml' 2>/dev/null
+# Find the compose file path for a running container
+docker inspect --format='{{index .Config.Labels "com.docker.compose.project.working_dir"}}/{{index .Config.Labels "com.docker.compose.project.config_files"}}' <container_name>
+
+# Or search for compose files (check both .yml and .yaml extensions)
+find /home -maxdepth 4 \( -name 'docker-compose.yml' -o -name 'docker-compose.yaml' -o -name 'compose.yml' -o -name 'compose.yaml' \) 2>/dev/null
 
 # Check running containers for this app
 docker ps --format '{{.Names}}\t{{.Image}}\t{{.Ports}}\t{{.Status}}'
@@ -40,10 +43,9 @@ docker compose -f <compose_file> ps
 # Check the unit
 systemctl status <service_name>
 
-# Find the port
-ss -tlnp | grep <service_name>
-# or check the unit file:
-systemctl cat <service_name>
+# Find the port — try these in order:
+sudo ss -tlnp | grep <process_name>
+systemctl cat <service_name>          # look for port in ExecStart or Environment
 ```
 
 **For binaries:**
@@ -57,17 +59,24 @@ ps aux | grep <binary_name>
 If the app has a web interface:
 
 ```bash
-# Check if it responds
+# Check if it responds locally
 curl -s -o /dev/null -w "%{http_code}" http://localhost:<port>/
 curl -s -o /dev/null -w "%{http_code}" http://localhost:<port>/health
 ```
 
 Note the endpoint URL (e.g., `https://myapp.sudosu.fyi`) and whether it's behind Caddy.
 
-If behind Caddy, check the subdomain mapping:
-```bash
-grep -A3 '<appname>' /etc/caddy/Caddyfile /etc/caddy/apps.caddy 2>/dev/null
-```
+If behind Caddy, check the subdomain mapping. **Warning:** Caddy configs may contain secrets (API tokens, auth credentials). Only note the hostname and reverse_proxy target — do not paste full config blocks.
+
+Inspect the Caddy config manually and note which subdomain routes to which port. The config is typically at `/etc/caddy/Caddyfile` with app routes in `/etc/caddy/apps.caddy`.
+
+**For apps that listen on a port but don't have a Caddy subdomain yet:**
+- Set `endpoint` to `null` (no public URL yet)
+- Set `subdomain` to `null`
+- Still set `port` to the internal port — agents need this for health checks and access via Tailscale IP
+
+**For apps with no web interface** (background workers, CLI tools):
+- Omit the entire access section or set all fields to `null`
 
 ### 4. Classify the app (on Mac)
 
@@ -142,7 +151,7 @@ After registration, confirm:
 - [ ] Server referenced in `server` field exists in `servers.yaml`
 - [ ] If web app: endpoint is reachable from Tailscale network
 - [ ] If health_check set: health endpoint returns 200
-- [ ] YAML is valid: file has no syntax errors by inspection
+- [ ] YAML is valid: `uv run --with pyyaml python3 -c "import yaml; yaml.safe_load(open('registry/apps.yaml')); print('Valid')"`
 
 ## Decision guide: what to register
 
@@ -156,10 +165,18 @@ Not every running process needs to be in the registry. Register an app if:
 Skip registration for:
 - System services (cron, ssh, NetworkManager)
 - One-off experiments or temporary containers
+- Legacy/unused services the user confirms are not needed
 - Services you plan to remove soon
+
+**When in doubt, ask the user.** During initial server onboarding, present the full list of discovered services and let the user decide what's worth registering. This is a one-time judgment call.
+
+## The registry rule
+
+**After a server is onboarded, all new apps deployed to it must be registered via this protocol. If an app is not in the registry, it does not exist.** This ensures the registry stays complete and agents can trust it as the source of truth.
 
 ## Notes
 
 - **One app = one registry entry**, even if it has multiple containers. The compose file groups them; the registry tracks the app as a unit.
 - **Dependencies** (`depends_on`) are informational — they help agents understand the dependency graph but don't enforce startup order.
 - **Repos:** If the app's source code is a registered repo, link them via the `repo` field. The deployment relationship (which server, which app) lives here in apps.yaml, not in repos.yaml.
+- **Internal compose dependencies** (e.g., an app's own Postgres or Redis) are part of the app, not separate registry entries. Only register standalone shared databases as separate apps.
