@@ -48,7 +48,7 @@ check "registry/servers.yaml exists" test -f "$INFRA_DIR/registry/servers.yaml"
 check "registry/apps.yaml exists" test -f "$INFRA_DIR/registry/apps.yaml"
 check "registry/repos.yaml exists" test -f "$INFRA_DIR/registry/repos.yaml"
 check "infra.md exists" test -f "$INFRA_DIR/infra.md"
-check "CLAUDE.md symlink valid" test -L "$CLAUDE_MD" -a -f "$CLAUDE_MD"
+check "CLAUDE.md has stack injection" grep -q "STACK_INJECT_START" "$CLAUDE_MD"
 
 # Sync freshness (only for real clones, not symlinks)
 if [[ -d "$INFRA_DIR/.git" && ! -L "$INFRA_DIR" ]]; then

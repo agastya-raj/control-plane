@@ -5,7 +5,7 @@
 # 1. Creates ~/.stack/ directory
 # 2. Clones control-plane to ~/.stack/infra/ (or pulls if already cloned)
 # 3. Sets up a cron job to pull every 5 minutes
-# 4. Symlinks CLAUDE.md and skills/ to ~/.claude/
+# 4. Injects stack pointers into ~/.claude/CLAUDE.md and symlinks skills/
 # 5. Runs a health check to verify everything works
 #
 # Usage:
@@ -108,28 +108,39 @@ else
     info "Skipping cron (symlink or no .git — Mac dev setup)"
 fi
 
-# ─── Step 4: Symlink CLAUDE.md and skills/ ───────────────────────────────────
+# ─── Step 4: Inject stack pointers into CLAUDE.md + symlink skills/ ──────────
 
 CLAUDE_DIR="$HOME/.claude"
+INJECT_FILE="$INFRA_DIR/claude/stack_inject.md"
 
 if [[ ! -d "$CLAUDE_DIR" ]]; then
     mkdir -p "$CLAUDE_DIR" || fail "Could not create $CLAUDE_DIR"
     info "Created $CLAUDE_DIR"
 fi
 
-# Symlink CLAUDE.md
-if [[ -L "$CLAUDE_DIR/CLAUDE.md" ]]; then
-    info "CLAUDE.md symlink already exists"
-elif [[ -f "$CLAUDE_DIR/CLAUDE.md" ]]; then
-    warn "CLAUDE.md already exists (not a symlink) — backing up to CLAUDE.md.bak"
-    mv "$CLAUDE_DIR/CLAUDE.md" "$CLAUDE_DIR/CLAUDE.md.bak"
-    ln -sf "$INFRA_DIR/CLAUDE.md" "$CLAUDE_DIR/CLAUDE.md"
-    info "CLAUDE.md symlinked (old file backed up)"
-elif [[ -e "$CLAUDE_DIR/CLAUDE.md" ]]; then
-    warn "CLAUDE.md exists but is not a regular file or symlink — skipping"
+# Inject stack pointers into CLAUDE.md (doesn't replace — appends/updates)
+if [[ ! -f "$INJECT_FILE" ]]; then
+    warn "Stack inject file not found at $INJECT_FILE — skipping CLAUDE.md injection"
 else
-    ln -sf "$INFRA_DIR/CLAUDE.md" "$CLAUDE_DIR/CLAUDE.md"
-    info "CLAUDE.md symlinked"
+    CLAUDE_MD="$CLAUDE_DIR/CLAUDE.md"
+    if [[ -f "$CLAUDE_MD" ]] && grep -q "STACK_INJECT_START" "$CLAUDE_MD"; then
+        # Already injected — replace with latest version
+        # Remove old injection block and re-inject
+        sed -i.bak '/STACK_INJECT_START/,/STACK_INJECT_END/d' "$CLAUDE_MD" 2>/dev/null || \
+            sed -i '' '/STACK_INJECT_START/,/STACK_INJECT_END/d' "$CLAUDE_MD"
+        cat "$INJECT_FILE" >> "$CLAUDE_MD"
+        rm -f "$CLAUDE_MD.bak"
+        info "CLAUDE.md stack injection updated"
+    elif [[ -f "$CLAUDE_MD" ]]; then
+        # CLAUDE.md exists but no injection yet — append
+        echo "" >> "$CLAUDE_MD"
+        cat "$INJECT_FILE" >> "$CLAUDE_MD"
+        info "Stack pointers injected into existing CLAUDE.md"
+    else
+        # No CLAUDE.md — create with just the injection
+        cat "$INJECT_FILE" > "$CLAUDE_MD"
+        info "CLAUDE.md created with stack pointers"
+    fi
 fi
 
 # Symlink skills/ directory
@@ -187,7 +198,7 @@ check() {
 check "~/.stack/infra/ exists" test -d "$INFRA_DIR"
 check "registry/servers.yaml readable" test -f "$INFRA_DIR/registry/servers.yaml"
 check "infra.md readable" test -f "$INFRA_DIR/infra.md"
-check "CLAUDE.md symlink works" test -L "$CLAUDE_DIR/CLAUDE.md" -a -f "$CLAUDE_DIR/CLAUDE.md"
+check "CLAUDE.md has stack injection" grep -q "STACK_INJECT_START" "$CLAUDE_DIR/CLAUDE.md"
 check "git works in infra dir" git -C "$INFRA_DIR" log --oneline -1
 
 if [[ -d "$INFRA_DIR/.git" && ! -L "$INFRA_DIR" ]]; then
