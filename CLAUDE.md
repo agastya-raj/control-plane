@@ -3,28 +3,11 @@
 Personal infrastructure mesh — unified registry of servers, apps, repos synced across all Tailscale-connected servers.
 
 ## Quick Start
-- Read VISION.md for the full architecture and phases
-- This repo will live at ~/.agastya/ on every server
+- Read `infra.md` for the infrastructure knowledge hub (registry, protocols, conventions)
+- Read `VISION.md` for the full architecture and phases
+- This repo lives at `~/.agastya/` on every server
 - Mac is primary writer, GitHub is hub, servers cron-pull
-
-## Structure (target)
-```
-registry/         ← servers.yaml, apps.yaml, repos.yaml
-protocols/        ← deploy.md, register_app.md, etc.
-handoffs/         ← active/completed compute handoff docs
-secrets/          ← age-encrypted secrets (gitignored values)
-skills/           ← Claude Code skills (symlinked on each server)
-sync/             ← install.sh, health_check.sh
-templates/        ← app/server/compose templates
-claude/           ← shared Claude Code config
-```
-
-## Conventions
-- YAML for all registry files
-- Markdown for all protocol docs
-- snake_case naming
-- Docker Compose as deploy standard
-- Every registry change gets a descriptive commit message
+- **Prefer protocols when available** — `protocols/` has step-by-step guides for registration and onboarding
 
 ## Symphony Orchestration Rules
 
@@ -57,7 +40,7 @@ This project is managed by Symphony (scale: **small**). Read `SYMPHONY.md` for p
 - Ensure tests exist for new functionality.
 
 ### Agent Discovery
-- Read `docs/contracts.md` for all public interfaces before implementing.
-- Read module `__init__.py` files for the API surface of each package.
-- Read `tests/conftest.py` for available test fixtures and patterns.
-- Check `### Module Dependencies` below for which modules to read for context.
+- Read `infra.md` for infrastructure knowledge (registry, protocols, conventions).
+- Read `registry/` YAML files for current server/app/repo state.
+- Read `protocols/` for step-by-step procedures.
+- Read `docs/contracts.md` for public interfaces (if applicable).
