@@ -50,7 +50,9 @@ Compare what's actually running against what's registered in `apps.yaml`. Flag a
 
 ```bash
 # What changed in the registry recently?
-cd ~/.stack/infra && git log --oneline -10
+# From wherever the control-plane repo is checked out
+cd ~/.stack/infra 2>/dev/null || cd ~/code/control-plane
+git log --oneline -10
 ```
 
 ## When to re-orient
