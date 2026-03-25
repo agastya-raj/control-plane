@@ -109,7 +109,7 @@ All connected via Tailscale.
 - Registry files:
   - servers.yaml — all servers with capabilities, Tailscale IPs, roles, gateway info
   - apps.yaml — all deployed apps with endpoints, deploy info, status
-  - repos.yaml — all repos with GitHub URLs, deploy targets, local paths
+  - repos.yaml — all repos with GitHub URLs, local paths per server, classification
 - CLAUDE.md — agent entry point ("read this first on any server")
 - Sync mechanism:
   - Mac is primary writer
@@ -528,6 +528,17 @@ Not all tasks need the same level of agent involvement:
 - **Level 2: Supervised** — agent makes decisions but logs everything for review
 - **Level 3: Autonomous** — agent plans, executes, deploys, reports results
 The handoff protocol could specify the autonomy level per task.
+
+### Repo Documentation Standards
+Every repo in the ecosystem should have a standard set of documentation files that give agents and humans instant context. The control-plane's CLAUDE.md should instruct agents to create/maintain these when working on any registered repo:
+
+- **VISION.md** — what this project is, why it exists, where it's going (the "north star")
+- **DESIGN.md** — architecture, key decisions, data flow, component relationships (the "how")
+- **CHANGELOG.md** — structured log of significant changes (complements git log with context)
+- **CONVENTIONS.md** — project-specific patterns, naming rules, testing approach (the "style guide")
+- **STATUS.md** — current state, known issues, what's in progress (the "pulse")
+
+Not every repo needs all of these — small tools might only need VISION.md and DESIGN.md. The registration protocol should assess which docs are appropriate based on repo size and category. Agents should be able to generate initial drafts of these from code analysis and git history.
 
 ---
 

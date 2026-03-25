@@ -1,0 +1,51 @@
+# repos.yaml — Registry of all repositories
+#
+# This file tracks where code lives — GitHub URLs, local clones on each server,
+# and what each repo is for. Populated during server onboarding.
+#
+# ─────────────────────────────────────────────────────────────────────────────
+schema_version: 1
+
+# Entries live under the `repos` key below. Each entry's key is the repo's
+# short name (snake_case, unique).
+#
+# Note: deployment info (which server, which app) lives in apps.yaml, not here.
+# repos.yaml tracks where code is cloned; apps.yaml tracks where it's deployed.
+#
+# Example entry:
+#
+#   compute_bridge:
+#     # ── Identity (required) ────────────────────────────────────────────────
+#     name: "compute-bridge"
+#     description: "MCP server for SSH-based remote execution"
+#     github_url: "https://github.com/agastya-raj/compute-bridge"
+#                                       # omit if no remote (local-only repo)
+#
+#     # ── Location (required — at least one entry) ───────────────────────────
+#     # Map of server_key → absolute path where this repo is cloned.
+#     # Server keys must exist in servers.yaml.
+#     # Use full absolute paths (no ~ expansion — YAML doesn't interpret it).
+#     local_paths:
+#       mac: "/Users/agastya/code/compute-bridge"
+#       gpu: "/home/agastya/code/compute-bridge"
+#
+#     # ── Classification (required) ──────────────────────────────────────────
+#     language: "python"                # python | go | swift | js | yaml | mixed
+#     category: infra                   # infra | research | tools | personal
+#                                       #   infra: control-plane, compute-bridge, custom_domain
+#                                       #   research: papers, experiments, models
+#                                       #   tools: knowledge_framework, symphony, dotfiles
+#                                       #   personal: side projects, misc
+#     status: active                    # active | archived | stale
+#                                       #   active = in use, maintained
+#                                       #   archived = no longer developed
+#                                       #   stale = exists but not touched recently
+#
+#     # ── Metadata (optional) ────────────────────────────────────────────────
+#     notes: ""
+#     added: "2026-03-25"
+
+repos: {}
+  # Add entries here using templates/repo_entry.yaml as a starting point.
+  # Each entry must be indented under this `repos:` key.
+  # When adding the first entry, replace `{}` above with a newline.

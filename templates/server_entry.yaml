@@ -1,0 +1,65 @@
+# Template: New Server Entry
+# Usage: Copy this block into registry/servers.yaml under the `servers:` key.
+#        Indent everything by 2 spaces so it's nested under `servers:`.
+#        Replace all <PLACEHOLDER> values. Remove optional fields you don't need.
+# See registry/servers.yaml header for full field documentation.
+
+<server_name>:                          # snake_case, unique, should match ssh_alias
+
+  # ── Identity (required) ──
+  hostname: "<HOSTNAME>"                # output of `hostname` on the server
+  ssh_alias: "<SSH_ALIAS>"              # Host entry in ~/.ssh/config
+  tailscale_ip: "<TAILSCALE_IP>"        # output of `tailscale ip -4`
+  user: "<USERNAME>"                    # default SSH user
+
+  # ── Role + Status (required) ──
+  roles: []                              # pick all that apply (replace [] with list):
+    # - compute                         #   heavy compute / ML
+    # - homelab                         #   self-hosted services
+    # - testbed                         #   research testbed
+    # - dev                             #   development machine
+    # - media                           #   media server
+    # - sandbox                         #   sandboxed execution
+    # List is extensible — add custom roles as needed (e.g., hpc, storage).
+  status: active                        # active | offline | decommissioned
+
+  # ── Network (optional) ──
+  gateway: null                         # server key to jump through, if not directly reachable
+                                        # only single-hop supported; chaining not yet defined
+  ports: []                             # notable open ports (informational)
+  domain: null                          # base domain if serving web (e.g., "sudosu.fyi")
+
+  # ── Capabilities (required) ──
+  capabilities:                         # flat list — agents use this for server selection
+    - tailscale                         # should always be present
+    # - gpu
+    # - docker
+    # - caddy
+    # - ollama
+    # - jupyter
+    # - claude_code
+    # - symphony
+    # - et
+
+  # ── Hardware (fill from audit) ──
+  hardware:
+    cpu: "<CPU_MODEL>"                  # e.g., "Intel i9-13900K", "Apple M4"
+    cores: null                         # physical cores (null if unknown)
+    threads: null                       # logical threads (null if unknown)
+    ram_gb: null                        # total RAM in GB
+    disk_gb: null                       # root partition size in GB
+    # gpu_model: null                   # uncomment if GPU present
+    # gpu_vram_gb: null
+
+  # ── Services (optional) ──
+  # Key services running on this server. Used by health checks and deploy
+  # protocols to understand what's expected to be running.
+  services: []
+  # - name: "<service>"
+  #   type: systemd                     # systemd | docker | binary
+  #   port: 0
+
+  # ── Metadata ──
+  notes: ""
+  added: "<YYYY-MM-DD>"
+  last_audit: "<YYYY-MM-DD>"

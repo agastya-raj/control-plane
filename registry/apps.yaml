@@ -1,0 +1,103 @@
+# apps.yaml — Registry of all deployed applications
+#
+# This file is the source of truth for what apps are deployed, where they run,
+# and how to reach them. Populated via protocols/register_app.md.
+#
+# ─────────────────────────────────────────────────────────────────────────────
+schema_version: 1
+
+# Entries live under the `apps` key below. Each entry's key is the app's
+# short name (snake_case, unique).
+#
+# Example — single-service docker-compose app:
+#
+#   uptime_kuma:
+#     # ── Identity (required) ────────────────────────────────────────────────
+#     name: "Uptime Kuma"
+#     description: "Infrastructure monitoring and uptime tracking"
+#     server: "gpu"                     # server key — must exist in servers.yaml
+#
+#     # ── Access (required for web apps, omit for non-web) ───────────────────
+#     # Set these if the app has a web interface. For background services,
+#     # CLI tools, or workers with no HTTP interface, leave as null or omit.
+#     endpoint: "https://uptime.sudosu.fyi"  # full URL
+#     subdomain: "uptime"               # Caddy subdomain (without .sudosu.fyi)
+#     port: 3001                        # internal port the app listens on
+#     health_check: "/"                 # path to check (200 = healthy)
+#
+#     # ── Deployment (required) ──────────────────────────────────────────────
+#     deploy_method: docker-compose     # docker-compose | systemd | binary | manual
+#                                       #   docker-compose: managed via compose file
+#                                       #   systemd: managed via systemd unit
+#                                       #   binary: standalone binary, started manually or via wrapper
+#                                       #   manual: no automated deploy; describe in notes
+#     compose_file: "/home/agastya/monitoring/docker-compose.yml"
+#
+#     # ── Status (required) ──────────────────────────────────────────────────
+#     status: running                   # running | stopped | degraded | unknown
+#                                       #   running = confirmed healthy (via health_check or manual)
+#                                       #   stopped = intentionally not running
+#                                       #   degraded = running but health check failing
+#                                       #   unknown = not recently verified
+#                                       # For non-web apps without health_check, status is set
+#                                       # manually or via process/port check.
+#
+#     # ── Relationships (optional) ───────────────────────────────────────────
+#     repo: "uptime_kuma_config"        # repo key in repos.yaml (if applicable)
+#     depends_on: []                    # other app keys this app needs
+#                                       #   informational — documents which apps should
+#                                       #   be running for this app to work correctly.
+#                                       #   not used for startup ordering or orchestration.
+#
+#     # ── Classification (optional) ──────────────────────────────────────────
+#     category: monitoring              # infra | service | monitoring | project | personal
+#                                       #   infra: caddy, auth, proxy, dns
+#                                       #   service: user-facing apps (wiki, git, etc.)
+#                                       #   monitoring: uptime, logs, metrics
+#                                       #   project: research/work-specific deployments
+#                                       #   personal: media, personal tools
+#     auth: tailscale                   # none | tailscale | authelia | basic | custom
+#
+#     # ── Metadata (optional) ────────────────────────────────────────────────
+#     notes: ""
+#     added: "2026-03-25"
+#     last_verified: "2026-03-25"
+#
+# Example — multi-service docker-compose app (web + worker + db):
+#
+#   outline:
+#     name: "Outline"
+#     description: "Team wiki and knowledge base"
+#     server: "gpu"
+#     endpoint: "https://wiki.sudosu.fyi"
+#     subdomain: "wiki"
+#     deploy_method: docker-compose
+#     compose_file: "/home/agastya/outline/docker-compose.yml"
+#     status: running
+#
+#     # For multi-container stacks, list all services with their roles.
+#     # Exactly one service must have `role: primary` — that service's port
+#     # and health_check are used for routing and health monitoring.
+#     services:
+#       - name: "outline"               # compose service name
+#         role: primary                  # primary | worker | database | cache | sidecar
+#         port: 3010
+#         health_check: "/"
+#       - name: "outline-postgres"
+#         role: database
+#         port: 5432
+#       - name: "outline-redis"
+#         role: cache
+#         port: 6379
+#
+#     depends_on: ["authelia"]
+#     category: service
+#     auth: authelia
+
+apps: {}
+  # Add entries here using templates/app_entry.yaml as a starting point.
+  # Each entry must be indented under this `apps:` key.
+  # When adding the first entry, replace `{}` above with a newline.
+  #
+  # Simple apps: set port, health_check, deploy fields directly.
+  # Multi-container apps: use the `services` list to describe each container.

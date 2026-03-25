@@ -1,0 +1,30 @@
+# Template: New Repo Entry
+# Usage: Copy this block into registry/repos.yaml under the `repos:` key.
+#        Indent everything by 2 spaces so it's nested under `repos:`.
+#        Replace all <PLACEHOLDER> values. Remove optional fields you don't need.
+# See registry/repos.yaml header for full field documentation.
+#
+# Note: deployment info (which server, which app) lives in apps.yaml, not here.
+
+<repo_name>:                            # snake_case, unique
+
+  # ── Identity (required) ──
+  name: "<Display Name>"
+  description: "<one-line description>"
+  github_url: "<GITHUB_URL>"            # omit if local-only repo
+
+  # ── Location (required — at least one entry) ──
+  # Map of server_key → absolute path. Keys must exist in servers.yaml.
+  # Use full absolute paths (no ~ — YAML doesn't expand it).
+  local_paths: {}                       # replace {} with entries when filling in
+    # mac: "/Users/agastya/code/<repo>"
+    # gpu: "/home/agastya/code/<repo>"
+
+  # ── Classification (required) ──
+  language: "<LANGUAGE>"                # python | go | swift | js | yaml | mixed
+  category: infra                       # infra | research | tools | personal
+  status: active                        # active | archived | stale
+
+  # ── Metadata ──
+  notes: ""
+  added: "<YYYY-MM-DD>"

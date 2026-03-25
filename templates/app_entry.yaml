@@ -1,0 +1,66 @@
+# Template: New App Entry
+# Usage: Copy this block into registry/apps.yaml under the `apps:` key.
+#        Indent everything by 2 spaces so it's nested under `apps:`.
+#        Replace all <PLACEHOLDER> values. Remove optional fields you don't need.
+# See registry/apps.yaml header for full field documentation.
+
+# ─── Simple app (single container or service) ────────────────────────────────
+
+<app_name>:                             # snake_case, unique
+
+  # ── Identity (required) ──
+  name: "<Display Name>"
+  description: "<one-line description>"
+  server: "<server_key>"                # must exist in servers.yaml
+
+  # ── Access (for web apps — omit section for non-web services) ──
+  endpoint: null                        # full URL, e.g., "https://myapp.sudosu.fyi"
+  subdomain: null                       # e.g., "myapp" (Caddy routes *.sudosu.fyi)
+  port: null                            # internal port (null for non-web apps)
+  health_check: null                    # e.g., "/health" (200 = healthy), null if none
+
+  # ── Deployment (required) ──
+  deploy_method: docker-compose         # docker-compose | systemd | binary | manual
+                                        #   docker-compose: managed via compose file
+                                        #   systemd: managed via systemd unit
+                                        #   binary: standalone binary
+                                        #   manual: no automation; describe in notes
+  # For docker-compose:
+  compose_file: "<PATH>"               # absolute path on the server
+
+  # For systemd (uncomment and remove compose_file):
+  # unit_name: "<NAME>.service"
+
+  # For binary (uncomment and remove compose_file):
+  # binary_path: "<PATH>"
+  # run_command: "<CMD>"
+
+  # ── Status (required) ──
+  status: running                       # running | stopped | degraded | unknown
+
+  # ── Relationships (optional) ──
+  repo: null                            # repo key in repos.yaml (if applicable)
+  depends_on: []                        # other app keys this needs (informational, not orchestration)
+
+  # ── Classification (optional) ──
+  category: service                     # infra | service | monitoring | project | personal
+  auth: tailscale                       # none | tailscale | authelia | basic | custom
+
+  # ── Metadata ──
+  notes: ""
+  added: "<YYYY-MM-DD>"
+  last_verified: "<YYYY-MM-DD>"
+
+# ─── Multi-container app (uncomment `services` block, remove single port/health_check) ──
+#
+#   services:
+#     - name: "<compose_service_name>"  # primary service (web frontend, API, etc.)
+#       role: primary                   # primary | worker | database | cache | sidecar
+#       port: 3000
+#       health_check: "/health"
+#     - name: "<db_service>"
+#       role: database
+#       port: 5432
+#     - name: "<cache_service>"
+#       role: cache
+#       port: 6379
