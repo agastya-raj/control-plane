@@ -123,13 +123,18 @@ if [[ ! -f "$INJECT_FILE" ]]; then
     warn "Stack inject file not found at $INJECT_FILE — skipping CLAUDE.md injection"
 else
     CLAUDE_MD="$CLAUDE_DIR/CLAUDE.md"
+    # Resolve symlinks so file operations work on the real file
+    if [[ -L "$CLAUDE_MD" ]]; then
+        CLAUDE_MD_REAL=$(readlink -f "$CLAUDE_MD" 2>/dev/null || readlink "$CLAUDE_MD" 2>/dev/null)
+    else
+        CLAUDE_MD_REAL="$CLAUDE_MD"
+    fi
+
     if [[ -f "$CLAUDE_MD" ]] && grep -q "STACK_INJECT_START" "$CLAUDE_MD"; then
-        # Already injected — replace with latest version
-        # Remove old injection block and re-inject
-        sed -i.bak '/STACK_INJECT_START/,/STACK_INJECT_END/d' "$CLAUDE_MD" 2>/dev/null || \
-            sed -i '' '/STACK_INJECT_START/,/STACK_INJECT_END/d' "$CLAUDE_MD"
-        cat "$INJECT_FILE" >> "$CLAUDE_MD"
-        rm -f "$CLAUDE_MD.bak"
+        # Already injected — replace with latest version via temp file
+        sed '/STACK_INJECT_START/,/STACK_INJECT_END/d' "$CLAUDE_MD_REAL" > "$CLAUDE_MD_REAL.tmp"
+        cat "$INJECT_FILE" >> "$CLAUDE_MD_REAL.tmp"
+        mv "$CLAUDE_MD_REAL.tmp" "$CLAUDE_MD_REAL"
         info "CLAUDE.md stack injection updated"
     elif [[ -f "$CLAUDE_MD" ]]; then
         # CLAUDE.md exists but no injection yet — append
