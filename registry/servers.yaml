@@ -79,7 +79,60 @@ schema_version: 1
 #     added: "2026-03-25"              # date registered (YYYY-MM-DD)
 #     last_audit: "2026-03-25"         # date of last hardware/service audit
 
-servers: {}
-  # Add entries here using templates/server_entry.yaml as a starting point.
-  # Each entry must be indented under this `servers:` key.
-  # When adding the first entry, replace `{}` above with a newline.
+servers:
+
+  gpu:
+    hostname: "agastya-gpumachine"
+    ssh_alias: "gpu"
+    tailscale_ip: "100.72.107.96"
+    user: "agastya"
+
+    roles:
+      - compute
+      - homelab
+    status: active
+
+    gateway: null
+    ports: [80, 443, 8001, 8180]
+    domain: "sudosu.fyi"
+
+    capabilities:
+      - tailscale
+      - gpu
+      - docker
+      - caddy
+      - ollama
+      - jupyter
+
+    hardware:
+      cpu: "13th Gen Intel Core i9-13900K"
+      cores: 24
+      threads: 48
+      ram_gb: 64
+      disk_gb: 984
+      gpu_model: "NVIDIA GeForce RTX 4090"
+      gpu_vram_gb: 24
+
+    services:
+      - name: "caddy"
+        type: systemd
+        port: 443
+      - name: "sudosu-dashboard"
+        type: systemd
+        port: 8180
+      - name: "marker_server"
+        type: binary
+        port: 8001
+      - name: "ollama"
+        type: systemd
+        port: 11434
+      - name: "jupyter"
+        type: systemd
+        port: 4839
+      - name: "docker"
+        type: systemd
+        port: null
+
+    notes: "Primary GPU workstation. Runs homelab services behind Caddy (*.sudosu.fyi). Many legacy Docker containers still running — cleanup pending."
+    added: "2026-03-25"
+    last_audit: "2026-03-25"

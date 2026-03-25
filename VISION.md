@@ -553,6 +553,14 @@ Every repo in the ecosystem should have a standard set of documentation files th
 
 Not every repo needs all of these — small tools might only need VISION.md and DESIGN.md. The registration protocol should assess which docs are appropriate based on repo size and category. Agents should be able to generate initial drafts of these from code analysis and git history.
 
+### GPU Server Cleanup
+The GPU server has accumulated many legacy Docker containers and systemd services over time with no clear record of what's active vs abandoned. After the control-plane is operational, a dedicated cleanup pass is needed:
+- Audit all running services against the registry
+- For each unregistered service, ask the user: keep and register, or decommission?
+- Stop and remove decommissioned containers/services
+- Clean up Caddy placeholder routes (grafana, jellyfin, hass, portainer) that point to non-existent or other servers
+- This is a concrete example of why the control-plane exists — infrastructure amnesia
+
 ---
 
 ## Success Criteria

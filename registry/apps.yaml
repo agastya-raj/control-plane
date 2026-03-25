@@ -94,10 +94,80 @@ schema_version: 1
 #     category: service
 #     auth: authelia
 
-apps: {}
-  # Add entries here using templates/app_entry.yaml as a starting point.
-  # Each entry must be indented under this `apps:` key.
-  # When adding the first entry, replace `{}` above with a newline.
-  #
-  # Simple apps: set port, health_check, deploy fields directly.
-  # Multi-container apps: use the `services` list to describe each container.
+apps:
+
+  caddy:
+    name: "Caddy"
+    description: "Reverse proxy for *.sudosu.fyi with automatic TLS via Cloudflare DNS"
+    server: "gpu"
+
+    endpoint: "https://sudosu.fyi"
+    subdomain: null
+    port: 443
+    health_check: null
+
+    deploy_method: systemd
+    unit_name: "caddy.service"
+
+    status: running
+
+    repo: null
+    depends_on: []
+
+    category: infra
+    auth: none
+
+    notes: "Handles all *.sudosu.fyi routing. Config at /etc/caddy/Caddyfile, app routes at /etc/caddy/apps.caddy. Currently has placeholder routes for grafana, jellyfin, hass, portainer on other servers."
+    added: "2026-03-25"
+    last_verified: "2026-03-25"
+
+  sudosu_dashboard:
+    name: "sudosu.fyi Dashboard"
+    description: "Custom domain dashboard and auth gateway (Vapor/Swift app)"
+    server: "gpu"
+
+    endpoint: "https://sudosu.fyi"
+    subdomain: null
+    port: 8180
+    health_check: null
+
+    deploy_method: systemd
+    unit_name: "sudosu-dashboard.service"
+
+    status: running
+
+    repo: null
+    depends_on: ["caddy"]
+
+    category: infra
+    auth: tailscale
+
+    notes: "Vapor app serving the main sudosu.fyi dashboard. Caddy proxies to localhost:8180."
+    added: "2026-03-25"
+    last_verified: "2026-03-25"
+
+  marker_server:
+    name: "Marker Server"
+    description: "PDF marker/OCR processing server"
+    server: "gpu"
+
+    endpoint: null
+    subdomain: null
+    port: 8001
+    health_check: null
+
+    deploy_method: binary
+    binary_path: null
+    run_command: null
+
+    status: running
+
+    repo: null
+    depends_on: []
+
+    category: service
+    auth: none
+
+    notes: "PDF processing server running on port 8001. Deploy method and binary path need verification."
+    added: "2026-03-25"
+    last_verified: "2026-03-25"
