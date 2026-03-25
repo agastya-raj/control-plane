@@ -16,9 +16,9 @@
   # ── Location (required — at least one entry) ──
   # Map of server_key → absolute path. Keys must exist in servers.yaml.
   # Use full absolute paths (no ~ — YAML doesn't expand it).
-  local_paths:
+  local_paths: {}                       # replace {} with entries when filling in
     # mac: "/Users/agastya/code/<repo>"
-    # gpu: "/home/agastya/<repo>"
+    # gpu: "/home/agastya/code/<repo>"
 
   # ── Classification (required) ──
   language: "<LANGUAGE>"                # python | go | swift | js | yaml | mixed

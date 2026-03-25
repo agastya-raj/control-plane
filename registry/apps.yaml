@@ -35,10 +35,12 @@ schema_version: 1
 #
 #     # ── Status (required) ──────────────────────────────────────────────────
 #     status: running                   # running | stopped | degraded | unknown
-#                                       #   running = confirmed healthy
+#                                       #   running = confirmed healthy (via health_check or manual)
 #                                       #   stopped = intentionally not running
 #                                       #   degraded = running but health check failing
 #                                       #   unknown = not recently verified
+#                                       # For non-web apps without health_check, status is set
+#                                       # manually or via process/port check.
 #
 #     # ── Relationships (optional) ───────────────────────────────────────────
 #     repo: "uptime_kuma_config"        # repo key in repos.yaml (if applicable)
@@ -74,7 +76,8 @@ schema_version: 1
 #     status: running
 #
 #     # For multi-container stacks, list all services with their roles.
-#     # The first entry is the primary (used for health checks and endpoint).
+#     # Exactly one service must have `role: primary` — that service's port
+#     # and health_check are used for routing and health monitoring.
 #     services:
 #       - name: "outline"               # compose service name
 #         role: primary                  # primary | worker | database | cache | sidecar
@@ -91,9 +94,10 @@ schema_version: 1
 #     category: service
 #     auth: authelia
 
-apps:
+apps: {}
   # Add entries here using templates/app_entry.yaml as a starting point.
   # Each entry must be indented under this `apps:` key.
+  # When adding the first entry, replace `{}` above with a newline.
   #
   # Simple apps: set port, health_check, deploy fields directly.
   # Multi-container apps: use the `services` list to describe each container.

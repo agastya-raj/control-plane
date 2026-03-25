@@ -13,13 +13,14 @@
   user: "<USERNAME>"                    # default SSH user
 
   # ── Role + Status (required) ──
-  roles:                                # pick all that apply:
-    # - compute
-    # - homelab
-    # - testbed
-    # - dev
-    # - media
-    # - sandbox
+  roles: []                              # pick all that apply (replace [] with list):
+    # - compute                         #   heavy compute / ML
+    # - homelab                         #   self-hosted services
+    # - testbed                         #   research testbed
+    # - dev                             #   development machine
+    # - media                           #   media server
+    # - sandbox                         #   sandboxed execution
+    # List is extensible — add custom roles as needed (e.g., hpc, storage).
   status: active                        # active | offline | decommissioned
 
   # ── Network (optional) ──

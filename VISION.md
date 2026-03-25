@@ -109,7 +109,7 @@ All connected via Tailscale.
 - Registry files:
   - servers.yaml — all servers with capabilities, Tailscale IPs, roles, gateway info
   - apps.yaml — all deployed apps with endpoints, deploy info, status
-  - repos.yaml — all repos with GitHub URLs, deploy targets, local paths
+  - repos.yaml — all repos with GitHub URLs, local paths per server, classification
 - CLAUDE.md — agent entry point ("read this first on any server")
 - Sync mechanism:
   - Mac is primary writer

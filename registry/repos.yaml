@@ -45,6 +45,7 @@ schema_version: 1
 #     notes: ""
 #     added: "2026-03-25"
 
-repos:
+repos: {}
   # Add entries here using templates/repo_entry.yaml as a starting point.
   # Each entry must be indented under this `repos:` key.
+  # When adding the first entry, replace `{}` above with a newline.

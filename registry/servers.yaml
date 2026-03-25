@@ -26,6 +26,7 @@ schema_version: 1
 #       - dev                           #   development machine
 #       - media                         #   media server
 #       - sandbox                       #   sandboxed execution environment
+#       # List is extensible — add custom roles as needed (e.g., hpc, storage).
 #     status: active                    # active | offline | decommissioned
 #                                       #   active = reachable and in use
 #                                       #   offline = exists but not currently reachable
@@ -78,6 +79,7 @@ schema_version: 1
 #     added: "2026-03-25"              # date registered (YYYY-MM-DD)
 #     last_audit: "2026-03-25"         # date of last hardware/service audit
 
-servers:
+servers: {}
   # Add entries here using templates/server_entry.yaml as a starting point.
   # Each entry must be indented under this `servers:` key.
+  # When adding the first entry, replace `{}` above with a newline.

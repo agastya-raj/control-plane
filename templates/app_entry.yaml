@@ -16,7 +16,7 @@
   # ── Access (for web apps — omit section for non-web services) ──
   endpoint: null                        # full URL, e.g., "https://myapp.sudosu.fyi"
   subdomain: null                       # e.g., "myapp" (Caddy routes *.sudosu.fyi)
-  port: 0                              # internal port the app listens on
+  port: null                            # internal port (null for non-web apps)
   health_check: null                    # e.g., "/health" (200 = healthy), null if none
 
   # ── Deployment (required) ──
