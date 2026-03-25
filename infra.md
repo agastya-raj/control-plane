@@ -27,6 +27,7 @@ templates/
 - **GitHub is the hub.** Servers pull changes via cron (every 5 min).
 - **Servers are read-only.** They never push — this prevents conflicts.
 - **Git is the source of truth.** Everything is auditable, versionable, works offline.
+- **The registry is the law.** If an app or server is not in the registry, it does not exist. All new deployments must be registered via the protocols.
 
 ## Registry overview
 

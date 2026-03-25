@@ -31,10 +31,11 @@ schema_version: 1
 #
 #     # ── Classification (required) ──────────────────────────────────────────
 #     language: "python"                # python | go | swift | js | yaml | mixed
-#     category: infra                   # infra | research | tools | personal
+#     category: infra                   # infra | research | tools | project | personal
 #                                       #   infra: control-plane, compute-bridge, custom_domain
 #                                       #   research: papers, experiments, models
 #                                       #   tools: knowledge_framework, symphony, dotfiles
+#                                       #   project: deployed apps with their own repos
 #                                       #   personal: side projects, misc
 #     status: active                    # active | archived | stale
 #                                       #   active = in use, maintained

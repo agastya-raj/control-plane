@@ -2,7 +2,7 @@
 
 Add a server to the control-plane registry so that agents and tools know it exists, how to reach it, and what it can do.
 
-**Important:** All registry edits happen on Mac and push to GitHub. Steps 1-5 gather information from the target server via SSH. Steps 6-9 are done on Mac.
+**Important:** All registry edits happen on Mac and push to GitHub. Steps 1-5 gather information from the target server via SSH. Steps 6-10 are done on Mac. Passwordless sudo is available on all servers.
 
 ## Prerequisites
 
@@ -28,7 +28,7 @@ Record the SSH alias you used to connect (the `Host` entry in `~/.ssh/config`).
 
 On Linux:
 ```bash
-# CPU — note: total cores = cores_per_socket × sockets
+# CPU — note: total_cores = cores_per_socket × sockets, total_threads = threads_per_core × total_cores
 lscpu | grep -E 'Model name|Core\(s\) per socket|Thread\(s\) per core|Socket'
 
 # RAM (note the total in GB)
@@ -80,12 +80,17 @@ List running services that are relevant (not system-level):
 
 On Linux:
 ```bash
-# Docker containers
+# Docker containers — names, ports, status, and compose file paths
 docker ps --format '{{.Names}}\t{{.Ports}}\t{{.Status}}' 2>/dev/null
+docker ps --format '{{.Names}}' | xargs -I{} \
+  docker inspect --format='{{.Name}}: {{index .Config.Labels "com.docker.compose.project.working_dir"}}' {} 2>/dev/null
 
 # Systemd services (filter system noise)
 systemctl list-units --type=service --state=running --no-pager --no-legend \
   | grep -v -E 'systemd|dbus|cron|ssh|network|snap|udev|journal|login|polkit|multipathd'
+
+# Find ports for systemd services
+sudo ss -tlnp | grep -v '127.0.0.53'
 ```
 
 On macOS:
@@ -93,7 +98,7 @@ On macOS:
 docker ps --format '{{.Names}}\t{{.Ports}}\t{{.Status}}' 2>/dev/null
 ```
 
-For each relevant service, note: name, type (systemd/docker/binary), and port.
+For each relevant service, note: name, type (systemd/docker/binary), port, and compose file path (if docker-compose).
 
 ### 5. Discover repos
 
@@ -109,7 +114,7 @@ On macOS:
 find ~/code -maxdepth 3 -name '.git' -type d 2>/dev/null
 ```
 
-Note the paths of important repos for step 8.
+Note the paths — you'll triage them in step 8.
 
 ### 6. Determine roles (on Mac)
 
@@ -126,7 +131,7 @@ Back on Mac, assign one or more roles based on what you observed:
 
 Roles are extensible — add custom ones if needed (e.g., `hpc`, `storage`).
 
-### 7. Fill the template (on Mac)
+### 7. Fill the server template (on Mac)
 
 Copy `templates/server_entry.yaml` and fill in all gathered data:
 
@@ -139,9 +144,27 @@ Copy `templates/server_entry.yaml` and fill in all gathered data:
 - Set `domain` if it serves web traffic
 - Set `added` and `last_audit` to today's date
 
-### 8. Add to registry (on Mac)
+### 8. Triage apps and repos with the user (on Mac)
 
-Insert the filled entry into `registry/servers.yaml` under the `servers:` key.
+**This step requires user input.** Present the discovered services and repos to the user and ask them to decide what to register.
+
+**For apps/services:** Show the user the full list of discovered containers and services, then ask:
+- Which of these are actively used and should be registered?
+- Which are legacy/unused and should be skipped?
+- Which are infrastructure that other apps depend on?
+
+Only register apps the user confirms. Use `protocols/register_app.md` for each confirmed app.
+
+**For repos:** Show the user the full list of discovered repos, then ask which to register. Skip:
+- Package managers and shell tools (`.nvm`, `.oh-my-zsh`, etc.)
+- Old backups and duplicates
+- Abandoned experiments
+
+For repos that are also deployed apps, register **both** the repo entry (in repos.yaml) and the app entry (in apps.yaml).
+
+### 9. Add to registry (on Mac)
+
+Insert the filled server entry into `registry/servers.yaml` under the `servers:` key.
 
 If this is the first entry, replace `servers: {}` with:
 ```yaml
@@ -149,9 +172,9 @@ servers:
   <your_entry_here>
 ```
 
-For important repos discovered in step 5, add them to `registry/repos.yaml` using `templates/repo_entry.yaml`. If a repo is also a deployed app, **also** register the app via `protocols/register_app.md` — both the repo entry and app entry are needed.
+Add confirmed apps to `registry/apps.yaml` and confirmed repos to `registry/repos.yaml`.
 
-### 9. Commit and push (on Mac)
+### 10. Commit and push (on Mac)
 
 ```bash
 git add registry/servers.yaml registry/repos.yaml registry/apps.yaml
@@ -166,10 +189,11 @@ After registration, confirm:
 - [ ] Entry has no `<PLACEHOLDER>` values remaining
 - [ ] SSH alias works: `ssh <ssh_alias> hostname`
 - [ ] Capabilities are accurate: spot-check 2-3 from the server
-- [ ] YAML is valid: `python3 -c "import json; open('/dev/null')"`  — or just ensure the file has no syntax errors by inspection
+- [ ] YAML is valid: `uv run --with pyyaml python3 -c "import yaml; yaml.safe_load(open('registry/servers.yaml')); print('Valid')"`
 
 ## Notes
 
 - **Mac is the primary writer.** Gather info via SSH, but all edits to registry files happen on Mac. Other servers are read-only and pull via cron.
 - **Gateway servers:** If the server is behind another server (e.g., `turing` reachable only from `gpu`), set `gateway: gpu`. Only single-hop gateways are supported currently.
 - **Re-auditing:** To update an existing server, re-run steps 1-5 and update the entry. Set `last_audit` to today.
+- **After onboarding:** Once a server is registered, all new apps deployed to it **must** be registered via `protocols/register_app.md`. If it's not in the registry, it doesn't exist.
