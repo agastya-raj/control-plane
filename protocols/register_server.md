@@ -2,11 +2,13 @@
 
 Add a server to the control-plane registry so that agents and tools know it exists, how to reach it, and what it can do.
 
+**Important:** All registry edits happen on Mac and push to GitHub. Steps 1-5 gather information from the target server via SSH. Steps 6-9 are done on Mac.
+
 ## Prerequisites
 
 - SSH access to the target server from Mac (via Tailscale)
 - The server has Tailscale installed and connected
-- An SSH alias configured in `~/.ssh/config` on Mac
+- An SSH alias configured in `~/.ssh/config` on Mac (e.g., `Host gpu`)
 
 ## Steps
 
@@ -24,22 +26,36 @@ Record the SSH alias you used to connect (the `Host` entry in `~/.ssh/config`).
 
 ### 2. Audit hardware
 
+On Linux:
 ```bash
-# CPU
+# CPU — note: total cores = cores_per_socket × sockets
 lscpu | grep -E 'Model name|Core\(s\) per socket|Thread\(s\) per core|Socket'
-# or on macOS:
-sysctl -n machdep.cpu.brand_string && sysctl -n hw.ncpu
 
-# RAM
-free -h | grep Mem            # Linux
-# or: sysctl -n hw.memsize    # macOS (bytes)
+# RAM (note the total in GB)
+free -h | grep Mem
 
-# Disk
+# Disk (note root partition size in GB)
 df -h /
 
 # GPU (if applicable)
 nvidia-smi --query-gpu=name,memory.total --format=csv,noheader
 ```
+
+On macOS:
+```bash
+# CPU
+sysctl -n machdep.cpu.brand_string
+sysctl -n hw.perflevel0.physicalcpu   # physical cores (performance)
+sysctl -n hw.logicalcpu               # logical threads
+
+# RAM (bytes → divide by 1073741824 for GB)
+sysctl -n hw.memsize
+
+# Disk
+df -h /
+```
+
+Convert all values to the schema's units: cores (integer), threads (integer), ram_gb (integer), disk_gb (integer).
 
 ### 3. Check capabilities
 
@@ -62,20 +78,42 @@ Add any capability that is confirmed working. Skip capabilities that aren't inst
 
 List running services that are relevant (not system-level):
 
+On Linux:
 ```bash
 # Docker containers
-docker ps --format '{{.Names}}\t{{.Ports}}\t{{.Status}}'
+docker ps --format '{{.Names}}\t{{.Ports}}\t{{.Status}}' 2>/dev/null
 
 # Systemd services (filter system noise)
 systemctl list-units --type=service --state=running --no-pager --no-legend \
   | grep -v -E 'systemd|dbus|cron|ssh|network|snap|udev|journal|login|polkit|multipathd'
 ```
 
+On macOS:
+```bash
+docker ps --format '{{.Names}}\t{{.Ports}}\t{{.Status}}' 2>/dev/null
+```
+
 For each relevant service, note: name, type (systemd/docker/binary), and port.
 
-### 5. Determine roles
+### 5. Discover repos
 
-Assign one or more roles based on what the server is used for:
+While still on the server, find git repos:
+
+On Linux:
+```bash
+find /home -maxdepth 3 -name '.git' -type d 2>/dev/null
+```
+
+On macOS:
+```bash
+find ~/code -maxdepth 3 -name '.git' -type d 2>/dev/null
+```
+
+Note the paths of important repos for step 8.
+
+### 6. Determine roles (on Mac)
+
+Back on Mac, assign one or more roles based on what you observed:
 
 | Role | When to assign |
 |------|---------------|
@@ -88,7 +126,7 @@ Assign one or more roles based on what the server is used for:
 
 Roles are extensible — add custom ones if needed (e.g., `hpc`, `storage`).
 
-### 6. Fill the template
+### 7. Fill the template (on Mac)
 
 Copy `templates/server_entry.yaml` and fill in all gathered data:
 
@@ -101,7 +139,7 @@ Copy `templates/server_entry.yaml` and fill in all gathered data:
 - Set `domain` if it serves web traffic
 - Set `added` and `last_audit` to today's date
 
-### 7. Add to registry
+### 8. Add to registry (on Mac)
 
 Insert the filled entry into `registry/servers.yaml` under the `servers:` key.
 
@@ -111,20 +149,12 @@ servers:
   <your_entry_here>
 ```
 
-### 8. Discover and register repos
+For important repos discovered in step 5, add them to `registry/repos.yaml` using `templates/repo_entry.yaml`. If a repo is also a deployed app, **also** register the app via `protocols/register_app.md` — both the repo entry and app entry are needed.
 
-While on the server, find git repos:
-
-```bash
-find /home -maxdepth 3 -name '.git' -type d 2>/dev/null
-```
-
-For each important repo, follow `protocols/register_app.md` if it's a deployed app, or add it directly to `registry/repos.yaml` using `templates/repo_entry.yaml`.
-
-### 9. Commit and push
+### 9. Commit and push (on Mac)
 
 ```bash
-git add registry/servers.yaml registry/repos.yaml
+git add registry/servers.yaml registry/repos.yaml registry/apps.yaml
 git commit -m "Register server: <server_name>"
 git push
 ```
@@ -133,13 +163,13 @@ git push
 
 After registration, confirm:
 
-- [ ] Server entry parses correctly: `python3 -c "import yaml; print(yaml.safe_load(open('registry/servers.yaml'))['servers']['<name>']['tailscale_ip'])"`
+- [ ] Entry has no `<PLACEHOLDER>` values remaining
 - [ ] SSH alias works: `ssh <ssh_alias> hostname`
 - [ ] Capabilities are accurate: spot-check 2-3 from the server
-- [ ] No `<PLACEHOLDER>` values remain in the entry
+- [ ] YAML is valid: `python3 -c "import json; open('/dev/null')"`  — or just ensure the file has no syntax errors by inspection
 
 ## Notes
 
-- **Mac is the primary writer.** All registry edits happen on Mac and push to GitHub. Other servers pull via cron.
+- **Mac is the primary writer.** Gather info via SSH, but all edits to registry files happen on Mac. Other servers are read-only and pull via cron.
 - **Gateway servers:** If the server is behind another server (e.g., `turing` reachable only from `gpu`), set `gateway: gpu`. Only single-hop gateways are supported currently.
-- **Re-auditing:** To update an existing server, re-run steps 2-5 and update the entry. Set `last_audit` to today.
+- **Re-auditing:** To update an existing server, re-run steps 1-5 and update the entry. Set `last_audit` to today.

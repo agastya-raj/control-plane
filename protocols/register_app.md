@@ -2,10 +2,12 @@
 
 Add a deployed application to the control-plane registry so agents know it exists, where it runs, and how to interact with it.
 
+**Important:** All registry edits happen on Mac and push to GitHub. Steps 1-3 gather information from the target server via SSH. Steps 4-7 are done on Mac.
+
 ## Prerequisites
 
 - The server the app runs on must already be registered in `registry/servers.yaml`
-- SSH access to that server
+- SSH access to that server from Mac
 
 ## Steps
 
@@ -67,7 +69,7 @@ If behind Caddy, check the subdomain mapping:
 grep -A3 '<appname>' /etc/caddy/Caddyfile /etc/caddy/apps.caddy 2>/dev/null
 ```
 
-### 4. Classify the app
+### 4. Classify the app (on Mac)
 
 Choose a category:
 
@@ -81,7 +83,7 @@ Choose a category:
 
 Choose auth method: `none`, `tailscale`, `authelia`, `basic`, or `custom`.
 
-### 5. Fill the template
+### 5. Fill the template (on Mac)
 
 Copy `templates/app_entry.yaml` and fill in:
 
@@ -114,7 +116,7 @@ Exactly one service must have `role: primary` — that service's port and health
 - Set `repo` if the source code is registered in `repos.yaml`
 - Set `added` and `last_verified` to today
 
-### 6. Add to registry
+### 6. Add to registry (on Mac)
 
 Insert the filled entry into `registry/apps.yaml` under the `apps:` key.
 
@@ -124,7 +126,7 @@ apps:
   <your_entry_here>
 ```
 
-### 7. Commit and push
+### 7. Commit and push (on Mac)
 
 ```bash
 git add registry/apps.yaml
@@ -136,11 +138,11 @@ git push
 
 After registration, confirm:
 
-- [ ] App entry parses correctly: `python3 -c "import yaml; print(yaml.safe_load(open('registry/apps.yaml'))['apps']['<name>']['status'])"`
+- [ ] Entry has no `<PLACEHOLDER>` values remaining
+- [ ] Server referenced in `server` field exists in `servers.yaml`
 - [ ] If web app: endpoint is reachable from Tailscale network
 - [ ] If health_check set: health endpoint returns 200
-- [ ] Server referenced in `server` field exists in `servers.yaml`
-- [ ] No `<PLACEHOLDER>` values remain
+- [ ] YAML is valid: file has no syntax errors by inspection
 
 ## Decision guide: what to register
 

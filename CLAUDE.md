@@ -7,7 +7,7 @@ Personal infrastructure mesh — unified registry of servers, apps, repos synced
 - Read `VISION.md` for the full architecture and phases
 - This repo lives at `~/.agastya/` on every server
 - Mac is primary writer, GitHub is hub, servers cron-pull
-- **Don't install or configure servers directly** — use the protocols in `protocols/`
+- **Prefer protocols when available** — `protocols/` has step-by-step guides for registration and onboarding
 
 ## Symphony Orchestration Rules
 
@@ -40,7 +40,7 @@ This project is managed by Symphony (scale: **small**). Read `SYMPHONY.md` for p
 - Ensure tests exist for new functionality.
 
 ### Agent Discovery
-- Read `docs/contracts.md` for all public interfaces before implementing.
-- Read module `__init__.py` files for the API surface of each package.
-- Read `tests/conftest.py` for available test fixtures and patterns.
-- Check `### Module Dependencies` below for which modules to read for context.
+- Read `infra.md` for infrastructure knowledge (registry, protocols, conventions).
+- Read `registry/` YAML files for current server/app/repo state.
+- Read `protocols/` for step-by-step procedures.
+- Read `docs/contracts.md` for public interfaces (if applicable).

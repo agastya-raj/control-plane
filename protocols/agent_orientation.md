@@ -9,13 +9,10 @@ What to do when you first start a session on any server in the infrastructure me
    ```bash
    hostname
    ```
-   Look up this hostname in `registry/servers.yaml` to understand what server you're on, its roles, capabilities, and what's expected to be running.
+   Look up this hostname in `registry/servers.yaml` (the `hostname` field) to find your server key, roles, capabilities, and what's expected to be running.
 
 3. **Check what's registered here:**
-   ```bash
-   # What apps should be running on this server?
-   grep -A1 "server:" registry/apps.yaml | grep -B1 "<this_server_name>"
-   ```
+   Read `registry/apps.yaml` and look for entries where `server` matches your server key (not hostname). For example, if your server key is `gpu`, look for `server: "gpu"` entries.
 
 ## Full orientation (when you need context)
 
@@ -27,13 +24,22 @@ What to do when you first start a session on any server in the infrastructure me
 
 ### Check current state
 
+On Linux:
 ```bash
-# What's actually running? (if Docker is available)
-docker ps --format 'table {{.Names}}\t{{.Status}}\t{{.Ports}}'
+# What's actually running?
+docker ps --format 'table {{.Names}}\t{{.Status}}\t{{.Ports}}' 2>/dev/null
 
 # What systemd services are active?
 systemctl list-units --type=service --state=running --no-pager --no-legend \
   | grep -v -E 'systemd|dbus|cron|ssh|network|snap|udev|journal|login|polkit|multipathd'
+```
+
+On macOS:
+```bash
+docker ps --format 'table {{.Names}}\t{{.Status}}\t{{.Ports}}' 2>/dev/null
+
+# List running services (macOS has no systemctl)
+launchctl list 2>/dev/null | head -20
 ```
 
 Compare what's actually running against what's registered in `apps.yaml`. Flag any discrepancies:
@@ -45,13 +51,6 @@ Compare what's actually running against what's registered in `apps.yaml`. Flag a
 ```bash
 # What changed in the registry recently?
 cd ~/.agastya && git log --oneline -10
-```
-
-### Check for active handoffs
-
-```bash
-# Any active compute handoffs involving this server?
-ls handoffs/ 2>/dev/null
 ```
 
 ## When to re-orient
@@ -67,12 +66,12 @@ ls handoffs/ 2>/dev/null
 |------|----------|
 | Onboard a new server | `protocols/register_server.md` |
 | Register an app | `protocols/register_app.md` |
-| Deploy an app | `protocols/deploy.md` *(future)* |
-| Hand off compute | `protocols/compute_handoff.md` *(future)* |
+| Deploy an app | `protocols/deploy.md` *(not yet created)* |
+| Hand off compute | `protocols/compute_handoff.md` *(not yet created)* |
 
 ## Conventions
 
 - **Mac is the primary writer** — registry edits happen on Mac, push to GitHub, servers pull
 - **YAML for data, Markdown for docs** — all registry files are YAML, all protocols are Markdown
 - **snake_case everywhere** — file names, YAML keys, server names
-- **Don't install or configure directly** — use the protocols. They ensure the registry stays in sync with reality.
+- **Prefer protocols when available** — they ensure the registry stays in sync with reality. For tasks without a protocol yet, proceed carefully and update the registry manually.

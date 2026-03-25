@@ -76,8 +76,8 @@ Repos.yaml tracks where code lives. Deployment info (which server, which app) li
 | Onboard a new server | Follow `protocols/register_server.md` |
 | Register an app | Follow `protocols/register_app.md` |
 | Orient on a server | Follow `protocols/agent_orientation.md` |
-| Find what's on a server | `grep -B1 "server: <name>" registry/apps.yaml` |
-| Find a server with GPU | `grep -A5 "capabilities:" registry/servers.yaml \| grep gpu` |
+| Find what's on a server | Read `registry/apps.yaml`, find entries where `server: "<name>"` |
+| Find a server with GPU | Read `registry/servers.yaml`, check `capabilities` lists for `gpu` |
 | Check a repo's location | Look up the repo key in `registry/repos.yaml` → `local_paths` |
 
 ## Architecture context
