@@ -55,10 +55,14 @@ if [[ -d "$INFRA_DIR/.git" && ! -L "$INFRA_DIR" ]]; then
     LAST_FETCH="$INFRA_DIR/.git/FETCH_HEAD"
     if [[ -f "$LAST_FETCH" ]]; then
         # Cross-platform stat: try GNU stat first, then BSD stat
-        FETCH_MTIME=$(stat -c %Y "$LAST_FETCH" 2>/dev/null || stat -f %m "$LAST_FETCH" 2>/dev/null || echo "0")
-        NOW=$(date +%s)
-        FETCH_AGE=$((NOW - FETCH_MTIME))
-        check "Sync fresh (< 15 min)" test "$FETCH_AGE" -lt 900
+        FETCH_MTIME=$(stat -c %Y "$LAST_FETCH" 2>/dev/null || stat -f %m "$LAST_FETCH" 2>/dev/null || echo "")
+        if [[ -n "$FETCH_MTIME" && "$FETCH_MTIME" != "0" ]]; then
+            NOW=$(date +%s)
+            FETCH_AGE=$((NOW - FETCH_MTIME))
+            check "Sync fresh (< 15 min)" test "$FETCH_AGE" -lt 900
+        else
+            check "Sync fresh (< 15 min)" false
+        fi
     else
         check "Sync fresh (< 15 min)" false
     fi

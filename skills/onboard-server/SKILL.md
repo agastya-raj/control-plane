@@ -62,12 +62,13 @@ Ask the user: "Do you want to set up ET (Eternal Terminal) for persistent connec
 
 If yes, guide them:
 1. Install ET on the server:
-   - Ubuntu/Debian: `sudo apt install et`
+   - Ubuntu/Debian: requires PPA — `sudo add-apt-repository ppa:jgmath2000/et && sudo apt update && sudo apt install et`
    - macOS: `brew install MisterTea/et/et`
-2. Verify the ET daemon is running: `systemctl is-active etserver` (Linux)
-3. Test from Mac: `et <server_alias>`
-4. Verify persistence: connect via ET, sleep Mac briefly, verify session survives
-5. Update `registry/servers.yaml` — add `et` to capabilities
+2. Enable and start the daemon (Linux): `sudo systemctl enable --now et`
+3. Verify running: `systemctl is-active et` (Linux)
+4. Test from Mac: `et <server_alias>`
+5. Verify persistence: connect via ET, sleep Mac briefly, verify session survives
+6. Update `registry/servers.yaml` — add `et` to capabilities
 
 ET is recommended for servers you connect to frequently. Skip for rarely-used servers.
 

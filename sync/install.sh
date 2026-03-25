@@ -70,6 +70,13 @@ if [[ -d "$INFRA_DIR/.git" ]]; then
     fi
 elif [[ -L "$INFRA_DIR" ]]; then
     info "$INFRA_DIR is a symlink (Mac dev setup) — skipping clone"
+elif [[ -d "$INFRA_DIR" ]]; then
+    # Directory exists but is not a git repo or symlink — likely a failed prior run
+    warn "$INFRA_DIR exists but is not a git repo — removing and re-cloning"
+    rm -rf "$INFRA_DIR"
+    if ! git clone "$REPO_URL" "$INFRA_DIR" 2>&1; then
+        fail "Clone failed — check network and repo URL"
+    fi
 else
     info "Cloning $REPO_URL → $INFRA_DIR"
     if ! git clone "$REPO_URL" "$INFRA_DIR" 2>&1; then
@@ -125,17 +132,26 @@ else
     CLAUDE_MD="$CLAUDE_DIR/CLAUDE.md"
     # Resolve symlinks so file operations work on the real file
     if [[ -L "$CLAUDE_MD" ]]; then
-        CLAUDE_MD_REAL=$(readlink -f "$CLAUDE_MD" 2>/dev/null || readlink "$CLAUDE_MD" 2>/dev/null)
+        CLAUDE_MD_REAL=$(readlink -f "$CLAUDE_MD" 2>/dev/null || readlink "$CLAUDE_MD" 2>/dev/null || true)
+        if [[ -z "$CLAUDE_MD_REAL" || ! -f "$CLAUDE_MD_REAL" ]]; then
+            warn "CLAUDE.md symlink is broken — removing and creating fresh"
+            rm -f "$CLAUDE_MD"
+            CLAUDE_MD_REAL="$CLAUDE_MD"
+        fi
     else
         CLAUDE_MD_REAL="$CLAUDE_MD"
     fi
 
-    if [[ -f "$CLAUDE_MD" ]] && grep -q "STACK_INJECT_START" "$CLAUDE_MD"; then
+    if [[ -f "$CLAUDE_MD_REAL" ]] && grep -q "STACK_INJECT_START" "$CLAUDE_MD_REAL"; then
         # Already injected — replace with latest version via temp file
-        sed '/STACK_INJECT_START/,/STACK_INJECT_END/d' "$CLAUDE_MD_REAL" > "$CLAUDE_MD_REAL.tmp"
-        cat "$INJECT_FILE" >> "$CLAUDE_MD_REAL.tmp"
-        mv "$CLAUDE_MD_REAL.tmp" "$CLAUDE_MD_REAL"
-        info "CLAUDE.md stack injection updated"
+        if sed '/STACK_INJECT_START/,/STACK_INJECT_END/d' "$CLAUDE_MD_REAL" > "$CLAUDE_MD_REAL.tmp" && \
+           cat "$INJECT_FILE" >> "$CLAUDE_MD_REAL.tmp" && \
+           mv "$CLAUDE_MD_REAL.tmp" "$CLAUDE_MD_REAL"; then
+            info "CLAUDE.md stack injection updated"
+        else
+            rm -f "$CLAUDE_MD_REAL.tmp"
+            warn "Failed to update CLAUDE.md injection"
+        fi
     elif [[ -f "$CLAUDE_MD" ]]; then
         # CLAUDE.md exists but no injection yet — append
         echo "" >> "$CLAUDE_MD"
