@@ -64,7 +64,8 @@ cd ~/.agastya && git log --oneline -10
 
 | Task | Protocol |
 |------|----------|
-| Onboard a new server | `protocols/register_server.md` |
+| Discover a server | `protocols/discover_server.md` (automated audit) |
+| Register a server | `protocols/register_server.md` (after discovery + user triage) |
 | Register an app | `protocols/register_app.md` |
 | Deploy an app | `protocols/deploy.md` *(not yet created)* |
 | Hand off compute | `protocols/compute_handoff.md` *(not yet created)* |

@@ -11,8 +11,9 @@ registry/
   repos.yaml       All repos — GitHub URLs, local paths per server
 
 protocols/
-  register_server.md   How to onboard a new server
-  register_app.md      How to register an app
+  discover_server.md   Automated server audit — produces a discovery report
+  register_server.md   Register a server + confirmed apps/repos from the report
+  register_app.md      Register an individual app (post-onboarding)
   agent_orientation.md What to do first on any server
 
 templates/
@@ -74,7 +75,7 @@ Repos.yaml tracks where code lives. Deployment info (which server, which app) li
 
 | I want to... | Do this |
 |--------------|---------|
-| Onboard a new server | Follow `protocols/register_server.md` |
+| Onboard a new server | Run `protocols/discover_server.md`, review report with user, then `protocols/register_server.md` |
 | Register an app | Follow `protocols/register_app.md` |
 | Orient on a server | Follow `protocols/agent_orientation.md` |
 | Find what's on a server | Read `registry/apps.yaml`, find entries where `server: "<name>"` |
