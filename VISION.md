@@ -25,22 +25,22 @@ Built compute-bridge (MCP server for SSH-based remote execution) as the transpor
 ```
 ┌─────────────────────────────────────────────────┐
 │  Knowledge Layer (WHY)                           │
-│  ~/ad_hoc/knowledge_framework                    │
+│  ~/.stack/knowledge/                             │
 │  Research context, architecture decisions,        │
 │  lessons learned. Full clone on all servers.      │
 ├─────────────────────────────────────────────────┤
 │  Project Layer (WHAT)                            │
-│  Symphony (~/.symphony/)                         │
+│  ~/.stack/symphony/                              │
 │  Planning, PR workflow, code review, Linear sync. │
 │  Runs on all servers with Claude Code.            │
 ├─────────────────────────────────────────────────┤
 │  Infrastructure Layer (WHERE/HOW)                │
-│  control-plane (~/.agastya/)                     │
+│  ~/.stack/infra/                                 │
 │  Server/app/repo registry, deploy protocols,      │
 │  handoff docs, secrets, sync. Git-backed.         │
 ├─────────────────────────────────────────────────┤
 │  Transport Layer (DO)                            │
-│  compute-bridge (MCP server)                     │
+│  ~/.stack/transport/                             │
 │  Remote execution, file transfer, background      │
 │  tasks. 16 tools, SSH-based.                      │
 └─────────────────────────────────────────────────┘
@@ -52,24 +52,25 @@ Built compute-bridge (MCP server for SSH-based remote execution) as the transpor
 
 Each layer has a single discoverable entry-point document that gives agents instant context. These are referenced from `~/.claude/CLAUDE.md` (global agent instructions), creating a connected knowledge graph:
 
-| Layer | Entry-point | Purpose |
-|-------|------------|---------|
-| Infrastructure | `infra.md` (this repo) | Registry structure, protocols, conventions, common tasks |
-| Project | `SYMPHONY.md` (per-project) | Orchestration config, scale, review patterns |
-| Knowledge | TBD (in knowledge_framework) | Knowledge base structure, how to search/capture/curate |
-| Transport | TBD (in compute-bridge) | Available tools, server config, transport options |
+| Layer | Path | Entry-point | Purpose |
+|-------|------|------------|---------|
+| Infrastructure | `~/.stack/infra/` | `infra.md` | Registry structure, protocols, conventions, common tasks |
+| Project | `~/.stack/symphony/` | `SYMPHONY.md` (per-project) | Orchestration config, scale, review patterns |
+| Knowledge | `~/.stack/knowledge/` | TBD | Knowledge base structure, how to search/capture/curate |
+| Transport | `~/.stack/transport/` | TBD | Available tools, server config, transport options |
 
 Each entry-point doc answers: what is this layer, why does it exist, where are things, and how do I use it. An agent reads CLAUDE.md → discovers all layers → reads the relevant doc → knows what's available.
 
 ## What Already Exists
 
 ### compute-bridge ✅ (built, tested, committed)
-- ~/code/compute-bridge — MCP server with 16 tools
+- Currently at ~/code/compute-bridge (target: ~/.stack/transport/)
+- MCP server with 16 tools
 - Remote shim auto-deployed to servers (stdlib-only, Python 3.8+)
 - Structured JSON envelopes for all responses
 - Background task management (start/status/logs/stop)
 - File push/pull, project scaffolding, server health
-- Config at ~/.config/compute-bridge/config.yaml
+- Config at ~/.config/compute-bridge/config.yaml (target: ~/.stack/transport/config.yaml)
 - 79 unit tests + 3 E2E tests passing
 - Opt-in via disabledMcpjsonServers toggle
 - Dual-reviewed (Claude + Codex), all HIGH/MEDIUM findings fixed
@@ -83,6 +84,7 @@ Each entry-point doc answers: what is this layer, why does it exist, where are t
 - Will be extended as the status hub (Phase 4)
 
 ### Symphony ✅ (built, running on Mac)
+- Currently at ~/.symphony/ (target: ~/.stack/symphony/)
 - Dev orchestration: planning, PR creation, code review, Linear sync
 - Cron-based Codex reviews, tech debt scanning
 - Session hooks for Claude Code
@@ -90,7 +92,7 @@ Each entry-point doc answers: what is this layer, why does it exist, where are t
 - To be deployed on all servers (future phase)
 
 ### knowledge_framework ✅ (exists, needs integration)
-- Shared knowledge base at ~/ad_hoc/knowledge_framework
+- Currently at ~/ad_hoc/knowledge_framework (target: ~/.stack/knowledge/)
 - Captures research context, architecture decisions, lessons learned
 - Currently Mac + GitHub only
 - To be cloned on all servers (future phase)
@@ -118,7 +120,7 @@ All connected via Tailscale.
 **Goal:** Any agent on any server is instantly oriented — knows all servers, apps, repos, and how to reach them.
 
 **Deliverables:**
-- Git repo at ~/.agastya/, GitHub-backed (github.com/agastya/control-plane)
+- Git repo at ~/.stack/infra/, GitHub-backed (github.com/agastya/control-plane)
 - Registry files:
   - servers.yaml — all servers with capabilities, Tailscale IPs, roles, gateway info
   - apps.yaml — all deployed apps with endpoints, deploy info, status
@@ -133,7 +135,7 @@ All connected via Tailscale.
   - Install ET on Mac + GPU
   - Verify et <server> works for all registered servers
 - Claude Code config sync:
-  - ~/.agastya/claude/CLAUDE.md symlinked to ~/.claude/CLAUDE.md on each server
+  - ~/.stack/infra/CLAUDE.md symlinked to ~/.claude/CLAUDE.md on each server
   - Shared skills directory (empty for now, populated in Phase 3)
 - Initial population: audit Mac + GPU for all current servers/apps/repos
 
@@ -173,12 +175,12 @@ All connected via Tailscale.
 **Goal:** Agents can act on the registry (not just read it) and are briefed on changes each session.
 
 **Deliverables:**
-- Claude Code skills (in ~/.agastya/skills/, symlinked to ~/.claude/skills/):
+- Claude Code skills (in ~/.stack/infra/skills/, symlinked to ~/.claude/skills/):
   - /register-app — interactive skill to register a new app
   - /deploy — deploy an app to its target server
   - /server-status — quick check of a server's health + running apps
 - Session-start hook on every server:
-  - git pull ~/.agastya/
+  - cd ~/.stack/infra && git pull
   - Show registry changes in last 24h
   - Show active handoffs
   - Show server health summary
@@ -223,7 +225,7 @@ All connected via Tailscale.
 
 **Deliverables:**
 - age encryption setup:
-  - Public key in ~/.agastya/secrets/keys/age.pub (in git)
+  - Public key in ~/.stack/infra/secrets/keys/age.pub (in git)
   - Private key at ~/.age/key.txt on each server (not in git, one-time setup)
 - Secrets schema:
   - secrets.yaml — declares what each app/server needs (in git, no values)
@@ -267,7 +269,7 @@ All connected via Tailscale.
 
 **Deliverables:**
 - compute-bridge integration:
-  - Reads servers.yaml from ~/.agastya/registry/ (replaces its own config)
+  - Reads servers.yaml from ~/.stack/infra/registry/ (replaces its own config)
   - server_add writes to control-plane registry
   - Capability matching: "find a server with GPU and 20GB free VRAM"
   - Optional ET transport for long sessions
@@ -295,7 +297,7 @@ All connected via Tailscale.
 **Deliverables:**
 - health_check.sh on every server (cron, hourly):
   - Checks: disk space, Docker running, key services alive, sync freshness
-  - Writes results to ~/.agastya/health/<server>.yaml
+  - Writes results to ~/.stack/infra/health/<server>.yaml
   - Pushes to status hub /api/notify on failure
 - ntfy.sh integration:
   - Self-hosted or public ntfy.sh endpoint
@@ -357,7 +359,7 @@ All connected via Tailscale.
 ## File Structure (final vision)
 
 ```
-~/.agastya/                              ← git repo, synced everywhere
+~/.stack/infra/                              ← git repo, synced everywhere
 ├── CLAUDE.md                            ← agent entry point
 ├── registry/
 │   ├── servers.yaml                     ← all servers
@@ -413,14 +415,15 @@ SSH sessions drop on network changes, sleep, or roaming. Eternal Terminal (ET) m
 
 Not all Claude Code config should sync — but the essentials should be consistent across servers.
 
-**What syncs (via ~/.agastya/):**
+**What syncs (via ~/.stack/infra/):**
 ```
-~/.agastya/
-├── claude/
-│   ├── CLAUDE.md                ← global agent instructions (already planned)
-│   ├── skills/                  ← shared skills (deploy, register, handoff)
-│   ├── settings.base.yaml      ← base settings (effort level, permissions)
-│   └── agents/                  ← shared custom agent definitions
+~/.stack/infra/
+├── CLAUDE.md                    ← agent entry point (symlinked to ~/.claude/CLAUDE.md)
+├── infra.md                     ← infrastructure knowledge hub
+├── skills/                      ← shared skills (deploy, register, handoff)
+├── registry/                    ← servers, apps, repos
+├── protocols/                   ← onboarding, registration, deploy
+└── templates/                   ← entry templates
 ```
 
 **What stays local (NOT synced):**
@@ -431,8 +434,8 @@ Not all Claude Code config should sync — but the essentials should be consiste
 
 **Sync mechanism:** On server onboarding, `install.sh` creates symlinks:
 ```bash
-ln -sf ~/.agastya/claude/CLAUDE.md ~/.claude/CLAUDE.md
-ln -sf ~/.agastya/claude/skills/* ~/.claude/skills/
+ln -sf ~/.stack/infra/CLAUDE.md ~/.claude/CLAUDE.md
+ln -sf ~/.stack/infra/skills/* ~/.claude/skills/
 ```
 
 ### apps.yaml ↔ custom_domain Sync
@@ -440,7 +443,7 @@ ln -sf ~/.agastya/claude/skills/* ~/.claude/skills/
 The control-plane `apps.yaml` and custom_domain's `apps.yaml` are two registries that should be one.
 
 **Resolution:** control-plane's `apps.yaml` is the source of truth. custom_domain reads from it (or a sync job writes control-plane → custom_domain format). When an agent registers a new app via the protocol:
-1. Updates `~/.agastya/registry/apps.yaml`
+1. Updates `~/.stack/infra/registry/apps.yaml`
 2. Commits + pushes
 3. GPU pulls → custom_domain picks up → Caddy reloads → subdomain live
 
@@ -467,7 +470,7 @@ Beyond the status hub dashboard, there should be basic awareness of failures.
 **Lightweight approach:**
 - health_check.sh runs on every server via cron (hourly)
 - Checks: disk space, Docker running, key services alive, sync freshness
-- If a check fails: writes to ~/.agastya/health/<server>.yaml
+- If a check fails: writes to ~/.stack/infra/health/<server>.yaml
 - Status hub (custom_domain) aggregates health files
 - Optional: push notification via ntfy.sh (self-hosted or public) for critical failures
 

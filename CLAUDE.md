@@ -5,7 +5,7 @@ Personal infrastructure mesh — unified registry of servers, apps, repos synced
 ## Quick Start
 - Read `infra.md` for the infrastructure knowledge hub (registry, protocols, conventions)
 - Read `VISION.md` for the full architecture and phases
-- This repo lives at `~/.agastya/` on every server
+- This repo lives at `~/.stack/infra/` on every server (symlink on Mac, clone on remote servers)
 - Mac is primary writer, GitHub is hub, servers cron-pull
 - **Prefer protocols when available** — `protocols/` has step-by-step guides for registration and onboarding
 

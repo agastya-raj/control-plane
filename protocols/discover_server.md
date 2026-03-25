@@ -64,7 +64,7 @@ For each capability, check two things: (1) is the binary/package **installed**? 
 | ollama | `which ollama` | `systemctl is-active ollama` returns "active" |
 | jupyter | `which jupyter` | `systemctl is-active jupyter` returns "active" |
 | claude_code | `which claude` | `claude --version` |
-| symphony | `test -f ~/.symphony/projects.json` | — |
+| symphony | `test -f ~/.stack/symphony/projects.json` or `test -f ~/.symphony/projects.json` | — |
 | et | `which et` or `which etserver` | — |
 | tailscale | `which tailscale` | `tailscale status` (no error) |
 

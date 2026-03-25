@@ -50,7 +50,7 @@ Compare what's actually running against what's registered in `apps.yaml`. Flag a
 
 ```bash
 # What changed in the registry recently?
-cd ~/.agastya && git log --oneline -10
+cd ~/.stack/infra && git log --oneline -10
 ```
 
 ## When to re-orient

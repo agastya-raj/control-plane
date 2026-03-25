@@ -1,6 +1,6 @@
 # Infrastructure Knowledge Hub
 
-This repo (`control-plane`) is the central registry for a personal infrastructure mesh. It lives at `~/.agastya/` on every server and provides instant awareness of the entire ecosystem.
+This repo (`control-plane`) is the central registry for a personal infrastructure mesh. It lives at `~/.stack/infra/` on every server (symlink on Mac, clone on remote servers) and provides instant awareness of the entire ecosystem.
 
 ## What's here
 
@@ -85,13 +85,13 @@ Repos.yaml tracks where code lives. Deployment info (which server, which app) li
 
 ## Architecture context
 
-This repo is one layer of a 4-layer stack:
+This repo is one layer of a 4-layer stack. All layers live under `~/.stack/`:
 
-| Layer | Repo | Purpose |
+| Layer | Path | Purpose |
 |-------|------|---------|
-| Knowledge | `~/ad_hoc/knowledge_framework` | Research context, architecture decisions, lessons learned |
-| Project | Symphony (`~/.symphony/`) | Planning, PR workflow, code review, Linear sync |
-| **Infrastructure** | **`~/.agastya/` (this repo)** | **Server/app/repo registry, protocols, sync** |
-| Transport | `~/code/compute-bridge` | Remote execution via SSH (16 MCP tools) |
+| Knowledge | `~/.stack/knowledge/` | Research context, architecture decisions, lessons learned |
+| Project | `~/.stack/symphony/` | Planning, PR workflow, code review, Linear sync |
+| **Infrastructure** | **`~/.stack/infra/` (this repo)** | **Server/app/repo registry, protocols, sync** |
+| Transport | `~/.stack/transport/` | Remote execution via SSH (16 MCP tools) |
 
 See `VISION.md` for the full architecture, phases, and future plans.
