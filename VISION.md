@@ -48,6 +48,19 @@ Built compute-bridge (MCP server for SSH-based remote execution) as the transpor
 
 **Flow:** Knowledge tells agents *why*. Symphony tells them *what* to build. Control-plane tells them *where* things run and *how* to deploy. Compute-bridge *does* the remote execution.
 
+### Layer Entry Points
+
+Each layer has a single discoverable entry-point document that gives agents instant context. These are referenced from `~/.claude/CLAUDE.md` (global agent instructions), creating a connected knowledge graph:
+
+| Layer | Entry-point | Purpose |
+|-------|------------|---------|
+| Infrastructure | `infra.md` (this repo) | Registry structure, protocols, conventions, common tasks |
+| Project | `SYMPHONY.md` (per-project) | Orchestration config, scale, review patterns |
+| Knowledge | TBD (in knowledge_framework) | Knowledge base structure, how to search/capture/curate |
+| Transport | TBD (in compute-bridge) | Available tools, server config, transport options |
+
+Each entry-point doc answers: what is this layer, why does it exist, where are things, and how do I use it. An agent reads CLAUDE.md → discovers all layers → reads the relevant doc → knows what's available.
+
 ## What Already Exists
 
 ### compute-bridge ✅ (built, tested, committed)
