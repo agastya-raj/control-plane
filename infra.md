@@ -59,7 +59,7 @@ Apps.yaml is the single source of truth for deployment mapping.
 
 Every important repo is tracked with:
 - GitHub URL and local clone paths per server
-- Language and category (infra, research, tools, personal)
+- Language and category (infra, research, tools, project, personal)
 
 Repos.yaml tracks where code lives. Deployment info (which server, which app) lives in apps.yaml.
 

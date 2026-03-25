@@ -35,7 +35,7 @@ Host <alias>
 
 ### 5. Basic tools
 - [ ] `git` is installed on the server
-- [ ] `sudo` works without password (or user confirms sudo policy)
+- [ ] `sudo` works without password (required — discovery and install protocols use sudo non-interactively)
 
 ### 6. Optional (depends on server role)
 - [ ] Docker installed and running (if this server will run containers)

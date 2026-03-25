@@ -101,7 +101,7 @@ apps:
     description: "Reverse proxy for *.sudosu.fyi with automatic TLS via Cloudflare DNS"
     server: "gpu"
 
-    endpoint: "https://sudosu.fyi"
+    endpoint: null                # caddy is the proxy layer, not a destination app
     subdomain: null
     port: 443
     health_check: null

@@ -93,7 +93,7 @@ servers:
     status: active
 
     gateway: null
-    ports: [80, 443, 8001, 8180]
+    ports: [80, 443, 8001, 8180]       # notable externally-accessible ports (not all service ports)
     domain: "sudosu.fyi"
 
     capabilities:

@@ -72,8 +72,9 @@ On Linux:
 docker ps --format '{{.Names}}\t{{.Ports}}\t{{.Status}}' 2>/dev/null
 
 # Docker compose file paths for each container
+# Note: this returns the project directory; the actual file is usually docker-compose.yml inside it
 docker ps --format '{{.Names}}' 2>/dev/null | xargs -I{} \
-  docker inspect --format='{{.Name}}: {{index .Config.Labels "com.docker.compose.project.working_dir"}}' {} 2>/dev/null
+  docker inspect --format='{{.Name}}: {{index .Config.Labels "com.docker.compose.project.working_dir"}}/{{index .Config.Labels "com.docker.compose.project.config_files"}}' {} 2>/dev/null
 
 # Systemd services (filter system noise)
 systemctl list-units --type=service --state=running --no-pager --no-legend \
@@ -92,19 +93,33 @@ docker ps --format '{{.Names}}\t{{.Ports}}\t{{.Status}}' 2>/dev/null
 
 On Linux:
 ```bash
-find /home -maxdepth 3 -name '.git' -type d 2>/dev/null
+# Find repos (strip /.git suffix to get repo root)
+find /home -maxdepth 3 -name '.git' -type d 2>/dev/null | sed 's/\/.git$//'
+
+# For each repo, get the remote URL
+for repo in $(find /home -maxdepth 3 -name '.git' -type d 2>/dev/null | sed 's/\/.git$//'); do
+  remote=$(git -C "$repo" remote get-url origin 2>/dev/null || echo "no remote")
+  echo "$repo → $remote"
+done
 ```
 
 On macOS:
 ```bash
-find ~/code -maxdepth 3 -name '.git' -type d 2>/dev/null
+find ~/code -maxdepth 3 -name '.git' -type d 2>/dev/null | sed 's/\/.git$//'
+
+for repo in $(find ~/code -maxdepth 3 -name '.git' -type d 2>/dev/null | sed 's/\/.git$//'); do
+  remote=$(git -C "$repo" remote get-url origin 2>/dev/null || echo "no remote")
+  echo "$repo → $remote"
+done
 ```
 
 ### 6. Check Caddy config (if Caddy is present)
 
+**Warning:** Caddy configs may contain secrets (API tokens, auth credentials) in environment variable references or inline values. When including Caddy config in the discovery report, **summarize the routing rules only** (which subdomains point where). Do not include the full config verbatim.
+
 ```bash
-sudo cat /etc/caddy/Caddyfile 2>/dev/null
-sudo cat /etc/caddy/apps.caddy 2>/dev/null
+# Summarize subdomain routing — look for host matchers and reverse_proxy targets
+sudo grep -E '(host |reverse_proxy )' /etc/caddy/Caddyfile /etc/caddy/apps.caddy 2>/dev/null
 ```
 
 ## Output: Discovery Report
