@@ -1,0 +1,63 @@
+# apps.yaml — Registry of all deployed applications
+#
+# This file is the source of truth for what apps are deployed, where they run,
+# and how to reach them. Populated via protocols/register_app.md.
+#
+# Schema version: 1
+# ─────────────────────────────────────────────────────────────────────────────
+
+# Top-level key is the app's short name (snake_case, unique).
+
+# example_app:
+#
+#   # ── Identity (required) ──────────────────────────────────────────────────
+#   name: "Example App"               # human-readable display name
+#   description: "What this app does" # one-line description
+#   server: "gpu"                     # server key (must exist in servers.yaml)
+#
+#   # ── Access (required for web apps, optional otherwise) ───────────────────
+#   endpoint: "https://example.sudosu.fyi"  # primary URL (if web-facing)
+#   subdomain: "example"              # Caddy subdomain (without .sudosu.fyi)
+#   port: 3000                        # port the app listens on (internal)
+#   health_check: "/health"           # health check path (relative to endpoint)
+#
+#   # ── Deployment (required) ────────────────────────────────────────────────
+#   deploy_method: docker-compose     # docker-compose | systemd | binary | manual
+#
+#   #   For docker-compose apps:
+#   compose_file: "/home/agastya/myapp/docker-compose.yml"  # absolute path on server
+#   compose_service: "web"            # specific service name in compose (if multi-service)
+#
+#   #   For systemd services:
+#   unit_name: "myapp.service"        # systemd unit name
+#
+#   #   For binary apps:
+#   binary_path: "/usr/local/bin/myapp"  # path to binary
+#   run_command: "myapp serve"         # how to start it
+#
+#   # ── Status (required) ────────────────────────────────────────────────────
+#   status: running                   # running | stopped | degraded | unknown
+#
+#   # ── Relationships (optional) ─────────────────────────────────────────────
+#   repo: "myapp"                     # repo key (must exist in repos.yaml)
+#   depends_on: []                    # other app keys this depends on
+#                                     # e.g., ["authelia", "postgres"]
+#
+#   # ── Category (optional) ──────────────────────────────────────────────────
+#   category: service                 # infra | service | monitoring | project | personal
+#                                     # infra: caddy, auth, proxy, dns
+#                                     # service: user-facing apps (wiki, git, etc.)
+#                                     # monitoring: uptime, logs, metrics
+#                                     # project: research/work-specific deployments
+#                                     # personal: media, personal tools
+#
+#   # ── Auth (optional) ──────────────────────────────────────────────────────
+#   auth: tailscale                   # none | tailscale | authelia | basic | custom
+#                                     # how access is controlled
+#
+#   # ── Metadata (optional) ──────────────────────────────────────────────────
+#   notes: ""                         # free-form notes
+#   added: "2026-03-24"              # date registered
+#   last_verified: "2026-03-24"      # date last confirmed running
+
+apps: {}

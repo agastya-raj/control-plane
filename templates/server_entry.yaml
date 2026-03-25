@@ -1,0 +1,59 @@
+# Template: New Server Entry
+# Usage: Copy this block into registry/servers.yaml under the `servers:` key.
+# Replace all <PLACEHOLDER> values. Remove optional fields you don't need.
+# See registry/servers.yaml header for full field documentation.
+
+<server_name>:                        # snake_case, unique, ideally matches ssh_alias
+
+  # ── Identity (required) ──
+  hostname: "<HOSTNAME>"              # output of `hostname` on the server
+  ssh_alias: "<SSH_ALIAS>"            # Host entry in ~/.ssh/config
+  tailscale_ip: "<TAILSCALE_IP>"      # output of `tailscale ip -4`
+  user: "<USERNAME>"                  # default SSH user
+
+  # ── Role + Status (required) ──
+  roles:                              # pick all that apply:
+    # - compute                       #   heavy compute / ML
+    # - homelab                       #   self-hosted services
+    # - testbed                       #   research testbed
+    # - dev                           #   development machine
+    # - media                         #   media server
+    # - sandbox                       #   sandboxed execution
+  status: active                      # active | offline | decommissioned
+
+  # ── Network (optional) ──
+  gateway: null                       # server_name of jump host, if not directly reachable
+  domain: null                        # base domain if serving web (e.g., "sudosu.fyi")
+
+  # ── Capabilities (required) ──
+  capabilities:                       # flat list — agents use this for server selection
+    - tailscale                       # should always be present
+    # - gpu
+    # - docker
+    # - caddy
+    # - ollama
+    # - jupyter
+    # - claude_code
+    # - symphony
+    # - et
+
+  # ── Hardware (fill from audit) ──
+  hardware:
+    cpu: "<CPU_MODEL>"                # e.g., "Intel i9-13900K", "Apple M4"
+    cores: 0                          # physical cores
+    threads: 0                        # logical threads (cores * threads_per_core)
+    ram_gb: 0                         # total RAM
+    disk_gb: 0                        # root partition size
+    # gpu_model: null                 # uncomment if GPU present
+    # gpu_vram_gb: null
+
+  # ── Services (optional) ──
+  services: []
+  # - name: "<service>"
+  #   type: systemd                   # systemd | docker | binary
+  #   port: 0
+
+  # ── Metadata ──
+  notes: ""
+  added: "<DATE>"                     # YYYY-MM-DD
+  last_audit: "<DATE>"

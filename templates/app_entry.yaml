@@ -1,0 +1,47 @@
+# Template: New App Entry
+# Usage: Copy this block into registry/apps.yaml under the `apps:` key.
+# Replace all <PLACEHOLDER> values. Remove optional fields you don't need.
+# See registry/apps.yaml header for full field documentation.
+
+<app_name>:                           # snake_case, unique
+
+  # ── Identity (required) ──
+  name: "<Display Name>"
+  description: "<one-line description>"
+  server: "<server_key>"              # must exist in servers.yaml
+
+  # ── Access (required for web apps) ──
+  endpoint: null                      # e.g., "https://myapp.sudosu.fyi"
+  subdomain: null                     # e.g., "myapp" (Caddy routes *.sudosu.fyi)
+  port: 0                            # internal port the app listens on
+  health_check: null                  # e.g., "/health" or null if no health endpoint
+
+  # ── Deployment (required) ──
+  deploy_method: docker-compose       # docker-compose | systemd | binary | manual
+
+  # For docker-compose:
+  compose_file: "<PATH>"             # absolute path on the server
+  # compose_service: null            # if multi-service compose, which one is primary
+
+  # For systemd:
+  # unit_name: "<NAME>.service"
+
+  # For binary:
+  # binary_path: "<PATH>"
+  # run_command: "<CMD>"
+
+  # ── Status (required) ──
+  status: running                     # running | stopped | degraded | unknown
+
+  # ── Relationships (optional) ──
+  repo: null                          # repo key in repos.yaml
+  depends_on: []                      # other app keys this depends on
+
+  # ── Classification (optional) ──
+  category: service                   # infra | service | monitoring | project | personal
+  auth: tailscale                     # none | tailscale | authelia | basic | custom
+
+  # ── Metadata ──
+  notes: ""
+  added: "<DATE>"                     # YYYY-MM-DD
+  last_verified: "<DATE>"

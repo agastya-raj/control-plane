@@ -1,0 +1,72 @@
+# servers.yaml — Registry of all servers in the infrastructure mesh
+#
+# This file is the source of truth for what servers exist, how to reach them,
+# and what they can do. Populated via protocols/register_server.md.
+#
+# Schema version: 1
+# ─────────────────────────────────────────────────────────────────────────────
+
+# Top-level key is the server's short name (used as identifier everywhere).
+# Must be snake_case, unique, and ideally match the SSH alias.
+
+# example_server:
+#
+#   # ── Identity (required) ──────────────────────────────────────────────────
+#   hostname: "server.local"          # actual hostname (from `hostname` command)
+#   ssh_alias: "example"              # SSH config alias (matches ~/.ssh/config Host)
+#   tailscale_ip: "100.x.x.x"        # Tailscale IPv4 address
+#   user: "agastya"                   # default SSH user
+#
+#   # ── Role + Status (required) ─────────────────────────────────────────────
+#   roles:                            # what this server is used for
+#     - compute                       # heavy compute / ML training
+#     - homelab                       # self-hosted services
+#     - testbed                       # research testbed
+#     - dev                           # development machine
+#     - media                         # media server
+#     - sandbox                       # sandboxed execution environment
+#   status: active                    # active | offline | decommissioned
+#
+#   # ── Network (optional) ───────────────────────────────────────────────────
+#   gateway: null                     # if behind another server, name of gateway
+#                                     # e.g., gateway: gpu → reach via ProxyJump
+#   ports: []                         # notable open ports (informational)
+#   domain: null                      # if serving web traffic (e.g., "sudosu.fyi")
+#
+#   # ── Capabilities (required) ──────────────────────────────────────────────
+#   capabilities:                     # flat list for querying ("find a server with gpu")
+#     - gpu                           # has NVIDIA GPU
+#     - docker                        # Docker installed and running
+#     - caddy                         # Caddy reverse proxy
+#     - ollama                        # Ollama LLM inference
+#     - jupyter                       # Jupyter notebook server
+#     - tailscale                     # Tailscale connected (should be all)
+#     - claude_code                   # Claude Code installed
+#     - symphony                      # Symphony orchestration installed
+#     - et                            # Eternal Terminal installed
+#
+#   # ── Hardware (optional, but recommended) ─────────────────────────────────
+#   hardware:
+#     cpu: "Intel i9-13900K"          # CPU model
+#     cores: 24                       # physical cores
+#     threads: 48                     # logical threads
+#     ram_gb: 64                      # total RAM in GB
+#     disk_gb: 1000                   # total root disk in GB
+#     gpu_model: "RTX 4090"           # GPU model (if applicable)
+#     gpu_vram_gb: 24                 # GPU VRAM in GB (if applicable)
+#
+#   # ── Services (optional) ──────────────────────────────────────────────────
+#   services:                         # key services running on this server
+#     - name: "caddy"                 # service name
+#       type: systemd                 # systemd | docker | binary
+#       port: 443                     # primary port
+#     - name: "ollama"
+#       type: systemd
+#       port: 11434
+#
+#   # ── Metadata (optional) ──────────────────────────────────────────────────
+#   notes: "Primary GPU workstation"  # free-form notes for agent context
+#   added: "2026-03-24"              # date this server was registered
+#   last_audit: "2026-03-24"         # date of last hardware/service audit
+
+servers: {}

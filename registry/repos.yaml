@@ -1,0 +1,40 @@
+# repos.yaml — Registry of all repositories
+#
+# This file tracks where code lives — GitHub URLs, local clones on each server,
+# and what each repo is for. Populated during server onboarding.
+#
+# Schema version: 1
+# ─────────────────────────────────────────────────────────────────────────────
+
+# Top-level key is the repo's short name (snake_case, unique).
+
+# example_repo:
+#
+#   # ── Identity (required) ──────────────────────────────────────────────────
+#   name: "Example Repo"              # human-readable name
+#   description: "What this repo is"  # one-line description
+#   github_url: "https://github.com/user/repo"  # GitHub URL (if exists)
+#
+#   # ── Location (required — at least one entry in local_paths) ──────────────
+#   local_paths:                      # map of server_key → absolute path
+#     gpu: "/home/agastya/example"    # where it's cloned on GPU
+#     mac: "~/code/example"           # where it's cloned on Mac
+#
+#   # ── Classification (required) ────────────────────────────────────────────
+#   language: "python"                # primary language (python | go | swift | js | yaml | mixed)
+#   category: infra                   # infra | research | tools | personal
+#                                     # infra: control-plane, compute-bridge, custom_domain
+#                                     # research: papers, experiments, models
+#                                     # tools: knowledge_framework, symphony, dotfiles
+#                                     # personal: side projects, misc
+#   status: active                    # active | archived | stale
+#
+#   # ── Deployment (optional) ────────────────────────────────────────────────
+#   deploy_target: "gpu"              # server key where this deploys (if applicable)
+#   deploy_app: "example_app"         # app key in apps.yaml (if applicable)
+#
+#   # ── Metadata (optional) ──────────────────────────────────────────────────
+#   notes: ""                         # free-form notes
+#   added: "2026-03-24"              # date registered
+
+repos: {}
