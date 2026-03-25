@@ -28,8 +28,8 @@ SSH into the server and collect details based on deploy method:
 # Find the compose file path for a running container
 docker inspect --format='{{index .Config.Labels "com.docker.compose.project.working_dir"}}/{{index .Config.Labels "com.docker.compose.project.config_files"}}' <container_name>
 
-# Or search for compose files
-find /home -maxdepth 4 -name 'docker-compose.yml' -o -name 'compose.yml' 2>/dev/null
+# Or search for compose files (check both .yml and .yaml extensions)
+find /home -maxdepth 4 \( -name 'docker-compose.yml' -o -name 'docker-compose.yaml' -o -name 'compose.yml' -o -name 'compose.yaml' \) 2>/dev/null
 
 # Check running containers for this app
 docker ps --format '{{.Names}}\t{{.Image}}\t{{.Ports}}\t{{.Status}}'

@@ -43,7 +43,7 @@ nvidia-smi --query-gpu=name,memory.total --format=csv,noheader
 On macOS:
 ```bash
 sysctl -n machdep.cpu.brand_string
-sysctl -n hw.perflevel0.physicalcpu   # physical cores
+sysctl -n hw.physicalcpu              # total physical cores
 sysctl -n hw.logicalcpu               # logical threads
 sysctl -n hw.memsize                  # RAM in bytes (÷ 1073741824 for GB)
 df -h /
@@ -93,11 +93,8 @@ docker ps --format '{{.Names}}\t{{.Ports}}\t{{.Status}}' 2>/dev/null
 
 On Linux:
 ```bash
-# Find repos (strip /.git suffix to get repo root)
-find /home -maxdepth 3 -name '.git' -type d 2>/dev/null | sed 's/\/.git$//'
-
-# For each repo, get the remote URL
-for repo in $(find /home -maxdepth 3 -name '.git' -type d 2>/dev/null | sed 's/\/.git$//'); do
+# Find repos (maxdepth 4 to catch /home/user/code/repo/.git)
+find /home -maxdepth 4 -name '.git' -type d 2>/dev/null | sed 's/\/.git$//' | while read -r repo; do
   remote=$(git -C "$repo" remote get-url origin 2>/dev/null || echo "no remote")
   echo "$repo → $remote"
 done
@@ -105,9 +102,7 @@ done
 
 On macOS:
 ```bash
-find ~/code -maxdepth 3 -name '.git' -type d 2>/dev/null | sed 's/\/.git$//'
-
-for repo in $(find ~/code -maxdepth 3 -name '.git' -type d 2>/dev/null | sed 's/\/.git$//'); do
+find ~/code -maxdepth 3 -name '.git' -type d 2>/dev/null | sed 's/\/.git$//' | while read -r repo; do
   remote=$(git -C "$repo" remote get-url origin 2>/dev/null || echo "no remote")
   echo "$repo → $remote"
 done
@@ -118,8 +113,8 @@ done
 **Warning:** Caddy configs may contain secrets (API tokens, auth credentials) in environment variable references or inline values. When including Caddy config in the discovery report, **summarize the routing rules only** (which subdomains point where). Do not include the full config verbatim.
 
 ```bash
-# Summarize subdomain routing — look for host matchers and reverse_proxy targets
-sudo grep -E '(host |reverse_proxy )' /etc/caddy/Caddyfile /etc/caddy/apps.caddy 2>/dev/null
+# Summarize subdomain routing — look for site blocks, host matchers, and reverse_proxy targets
+sudo grep -E '(^[a-zA-Z].*\{|host |reverse_proxy )' /etc/caddy/Caddyfile /etc/caddy/apps.caddy 2>/dev/null
 ```
 
 ## Output: Discovery Report
