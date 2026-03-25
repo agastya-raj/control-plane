@@ -95,7 +95,7 @@ servers:
     status: active
 
     gateway: null
-    ports: [80, 443, 8001, 8180]       # notable externally-accessible ports (not all service ports)
+    ports: [80, 443, 8001]              # notable externally-accessible ports (not all service ports)
     domain: "sudosu.fyi"
 
     capabilities:
@@ -115,6 +115,8 @@ servers:
       gpu_model: "NVIDIA GeForce RTX 4090"
       gpu_vram_gb: 24
 
+    # Services: what's actually running on this server (for health checks).
+    # Not all services are registered apps — see apps.yaml for the registered subset.
     services:
       - name: "caddy"
         type: systemd

@@ -93,6 +93,12 @@ sudo ss -tlnp | grep -v '127.0.0.53'
 On macOS:
 ```bash
 docker ps --format '{{.Names}}\t{{.Ports}}\t{{.Status}}' 2>/dev/null
+
+# macOS doesn't have systemctl — check for launchd user services
+launchctl list 2>/dev/null | grep -v -E 'com.apple|application.com' | head -20
+
+# Listening ports
+lsof -iTCP -sTCP:LISTEN -nP 2>/dev/null | grep -v -E 'mDNS|rapportd|sharingd'
 ```
 
 ### 5. Check installed runtimes
@@ -179,16 +185,9 @@ Present all gathered data to the user in a structured format:
 | ...  | ...  | ...   |
 
 ### Repos Found
-#### Active-looking (top-level)
-| Path | Remote | Notes |
-|------|--------|-------|
-| ...  | ...    | ...   |
-
-#### Archive/Documents
-[list paths]
-
-#### Skip (package managers, dotfile tools)
-[list paths]
+| Path | Remote |
+|------|--------|
+| ...  | ...    |
 
 ### Caddy Config
 [subdomain routing summary]
