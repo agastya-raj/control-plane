@@ -105,6 +105,7 @@ servers:
       - caddy
       - ollama
       - jupyter
+      - doppler                          # Doppler CLI + service token at /etc/doppler/token
 
     hardware:
       cpu: "13th Gen Intel Core i9-13900K"

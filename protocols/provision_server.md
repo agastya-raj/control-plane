@@ -37,7 +37,13 @@ Host <alias>
 - [ ] `git` is installed on the server
 - [ ] `sudo` works without password (required — discovery and install protocols use sudo non-interactively)
 
-### 6. Optional (depends on server role)
+### 6. Doppler (secrets management)
+- [ ] Doppler CLI installed: `(curl -Ls --tlsv1.2 --proto "=https" --retry 3 https://cli.doppler.com/install.sh || wget -t 3 -qO- https://cli.doppler.com/install.sh) | sudo sh`
+- [ ] Service token created on Mac: `doppler configs tokens create --project personal_keys --config prd <server>_readonly --plain`
+- [ ] Token stored on server: `sudo mkdir -p /etc/doppler && echo '<token>' | sudo tee /etc/doppler/token && sudo chmod 600 /etc/doppler/token`
+- [ ] Verified: `DOPPLER_TOKEN=$(sudo cat /etc/doppler/token) doppler secrets --only-names` lists secrets
+
+### 7. Optional (depends on server role)
 - [ ] Docker installed and running (if this server will run containers)
 - [ ] Python 3 available (for future scripts/tools)
 
