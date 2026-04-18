@@ -207,6 +207,7 @@ servers:
       - python3
       - fail2ban
       - ufw
+      - rclone                          # SFTP mount of ucc:~ at /mnt/ucc (systemd: rclone-ucc)
 
     hardware:
       cpu: "Intel Core Processor (Haswell, no TSX)"
@@ -214,6 +215,12 @@ servers:
       threads: 6
       ram_gb: 12
       disk_gb: 96
+
+    mounts:
+      - path: /mnt/ucc                  # ucc storage box (Ultra.cc), ~17 TB via rclone SFTP
+        source: "ucc:~/"
+        backend: rclone-sftp
+        service: rclone-ucc.service
 
     services:
       - name: "caddy"
@@ -229,9 +236,57 @@ servers:
         type: systemd
         port: null
       - name: "ssh"
-        type: systemd
+        type: systemd                   # socket-activated via ssh.socket
         port: 22
+      - name: "rclone-ucc"
+        type: systemd
+        port: null
 
-    notes: "OVH VPS, bought 2026-04-18. Intended as the deployment center for personal websites/services. Key-only SSH (password auth disabled), UFW on with 22/80/443 open, fail2ban active. No apps deployed yet. Claude Code install deferred."
+    notes: "OVH VPS, bought 2026-04-18. Deployment center for personal websites/services. Key-only SSH, UFW 22/80/443, fail2ban active. Caddy answers sudosu.fyi + *.sudosu.fyi with 204 No Content (placeholder until a real homepage is designed). DNS cutover handled in Cloudflare by user. /mnt/ucc is the ucc storage box mounted via rclone SFTP. No apps deployed yet. Claude Code install deferred."
+    added: "2026-04-18"
+    last_audit: "2026-04-18"
+
+  ucc:
+    hostname: "orbit"                   # shared-hosting hostname on Ultra.cc
+    ssh_alias: "ucc"
+    tailscale_ip: "100.77.214.101"      # ping works; SSH over tailnet REFUSED (userspace-networking limit)
+    public_ipv4: "46.232.211.65"        # primary SSH path is via this public IP (key auth)
+    provider: "ultra.cc"
+    user: "oggyraj"
+    os: "Debian 11 (bullseye)"
+
+    roles:
+      - storage
+    status: active
+
+    gateway: null
+    ports: []                           # Ultra.cc assigns ephemeral port slots; apps listen on 178xx range
+    domain: null
+
+    capabilities:
+      - tailscale                       # userspace-networking only; app-tailscale wrapper (not systemd)
+      - storage
+      - filebrowser                     # web file manager, auth'd, loopback :17828 fronted by nginx :17840
+      - webdav                          # available via filebrowser
+      - plex                            # installed via app-plex
+      - sonarr
+      - radarr
+      - bazarr
+      - prowlarr
+      - overseerr
+      - tautulli
+      - maintainerr
+      - homarr                          # dashboard
+
+    hardware:
+      cpu: "shared (unknown)"
+      cores: null
+      threads: null
+      ram_gb: null
+      disk_gb: 17000                    # 17 TB seedbox plan
+
+    services: []                        # managed by Ultra.cc wrappers, not user-visible systemd
+
+    notes: "Shared seedbox from Ultra.cc (ultra.cc). NOT a regular Linux host: no sudo, apps run inside namespaced containers, tailscaled is started by app-tailscale with userspace-networking and a static tailscale-serve config forwarding ports 17800–17815 to host.docker.internal. SSH over tailscale IP does NOT work — use public IPv4 46.232.211.65. Apps in ~/.apps managed via 'app-<name>' wrappers (install/start/stop/restart/upgrade). Home layout includes ~/storage, ~/media, ~/downloads, ~/webdav, ~/www, ~/zotero — mounted on 'deploy' at /mnt/ucc via rclone SFTP."
     added: "2026-04-18"
     last_audit: "2026-04-18"
