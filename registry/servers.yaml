@@ -176,3 +176,62 @@ servers:
     notes: "Dedicated sandbox server for Claude agents. Fresh install, no apps deployed. Has Node.js v22, Python 3.12, Rust/Cargo. ~/projects/ and ~/scratch/ prepared for use."
     added: "2026-03-25"
     last_audit: "2026-03-25"
+
+  deploy:
+    hostname: "deploy"
+    ssh_alias: "deploy"
+    tailscale_ip: "100.100.165.81"
+    public_ipv4: "57.128.214.221"
+    public_ipv6: "2001:41d0:601:1100::330b"
+    provider: "ovh"
+    user: "ubuntu"
+    os: "Ubuntu 25.04"
+
+    roles:
+      - deploy                          # deployment target for websites/services
+      - homelab
+    status: active
+
+    gateway: null
+    ports: [22, 80, 443]
+    domain: null                        # no domain attached yet
+
+    capabilities:
+      - tailscale
+      - docker
+      - caddy
+      - doppler                         # Doppler CLI + service token at /etc/doppler/token
+      - nvm
+      - node
+      - uv
+      - python3
+      - fail2ban
+      - ufw
+
+    hardware:
+      cpu: "Intel Core Processor (Haswell, no TSX)"
+      cores: 6
+      threads: 6
+      ram_gb: 12
+      disk_gb: 96
+
+    services:
+      - name: "caddy"
+        type: systemd
+        port: 443
+      - name: "docker"
+        type: systemd
+        port: null
+      - name: "tailscaled"
+        type: systemd
+        port: null
+      - name: "fail2ban"
+        type: systemd
+        port: null
+      - name: "ssh"
+        type: systemd
+        port: 22
+
+    notes: "OVH VPS, bought 2026-04-18. Intended as the deployment center for personal websites/services. Key-only SSH (password auth disabled), UFW on with 22/80/443 open, fail2ban active. No apps deployed yet. Claude Code install deferred."
+    added: "2026-04-18"
+    last_audit: "2026-04-18"
