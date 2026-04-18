@@ -242,7 +242,18 @@ servers:
         type: systemd
         port: null
 
-    notes: "OVH VPS, bought 2026-04-18. Deployment center for personal websites/services. Key-only SSH, UFW 22/80/443, fail2ban active. Caddy answers sudosu.fyi + *.sudosu.fyi with 204 No Content (placeholder until a real homepage is designed). DNS cutover handled in Cloudflare by user. /mnt/ucc is the ucc storage box mounted via rclone SFTP. No apps deployed yet. Claude Code install deferred."
+    notes: |
+      OVH VPS, bought 2026-04-18. Deployment center for personal websites/services.
+      Three-tier Caddy setup on the same box:
+        1. Public canonical — agastya.cc, www.agastya.cc (Cloudflare orange cloud, Full SSL, tls internal on origin) → 404 placeholder.
+        2. Public redirect  — agastya-raj.com, www.agastya-raj.com → 301 to agastya.cc (URI preserved).
+        3. Tailnet-only      — sudosu.fyi, *.sudosu.fyi (DNS-only A → 100.100.165.81; bound to tailscale interface; real Let's Encrypt wildcard cert via DNS-01 from Mac).
+      Cert pipeline runs from Mac (acme.sh + Cloudflare DNS-01), not from deploy — Cloudflare rate-limits the VPS's OVH IP with HTTP 429 code 971 on every API call. Mac cron at 11:58 renews and scp's cert to /etc/caddy/certs/ + reloads Caddy.
+      Key-only SSH, UFW 22/80/443, fail2ban, unattended-upgrades, key-only sudo.
+      /mnt/ucc is the ucc storage box mounted via rclone SFTP (17 TB).
+      Current cert: valid 2026-04-18 → 2026-07-17 (ECC P-256).
+      No apps deployed yet. Claude Code install deferred.
+      See: ~/code/vps_setup/README.md for ops reference.
     added: "2026-04-18"
     last_audit: "2026-04-18"
 
