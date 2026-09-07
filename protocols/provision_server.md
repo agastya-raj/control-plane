@@ -37,11 +37,13 @@ Host <alias>
 - [ ] `git` is installed on the server
 - [ ] `sudo` works without password (required — discovery and install protocols use sudo non-interactively)
 
-### 6. Doppler (secrets management)
-- [ ] Doppler CLI installed: `(curl -Ls --tlsv1.2 --proto "=https" --retry 3 https://cli.doppler.com/install.sh || wget -t 3 -qO- https://cli.doppler.com/install.sh) | sudo sh`
-- [ ] Service token created on Mac: `doppler configs tokens create --project personal_keys --config prd <server>_readonly --plain`
-- [ ] Token stored on server: `sudo mkdir -p /etc/doppler && echo '<token>' | sudo tee /etc/doppler/token && sudo chmod 600 /etc/doppler/token`
-- [ ] Verified: `DOPPLER_TOKEN=$(sudo cat /etc/doppler/token) doppler secrets --only-names` lists secrets
+### 6. 1Password (secrets management)
+Secrets live in 1Password (vault = former Doppler project, item = former config); hosts read them with a read-only service account through `secret-tool` (repo `agastya-raj/doppler_migration`, see its PLAN.md). Doppler is only a synced mirror until it is decommissioned.
+- [ ] 1Password CLI installed from the official apt repo: import the key to `/usr/share/keyrings/1password-archive-keyring.gpg`, add `deb [arch=<arch> signed-by=...] https://downloads.1password.com/linux/debian/<arch> stable main`, install the debsig policy, then `sudo apt-get install 1password-cli`; `op --version`
+- [ ] `secret-tool` installed for the operator user: `git clone git@github.com:agastya-raj/doppler_migration.git ~/code/doppler_migration && cd ~/code/doppler_migration && uv tool install --editable .`; `sudo ln -sfn ~/.local/bin/secret-tool /usr/local/bin/secret-tool` so root finds it too
+- [ ] Service account created on the Mac, read-only and scoped to the vaults this host needs: `op service-account create <server>-apps --vault personal_keys:read_items [--vault <other>:read_items] --raw`; save the token as a Personal-vault item `SA <server>-apps` (service accounts are immutable: to change scope, create a new one and revoke the old in the web UI)
+- [ ] Token placed on the server through a pipe, never a transcript: `op read "op://Personal/SA <server>-apps/credential" | ssh <server> 'sudo install -d -m 0755 /etc/1password/tokens && sudo install -m 0600 -o root -g root /dev/stdin /etc/1password/tokens/<server>-apps && sudo ln -sfn /etc/1password/tokens/<server>-apps /etc/1password/token'`; for the operator user: `... | ssh <server> 'install -d -m 0700 ~/.config/1password && install -m 0600 /dev/stdin ~/.config/1password/token'`
+- [ ] Verified: `secret-tool ls` (user) and `sudo secret-tool ls` (root) list the personal_keys/dev keys; `OP_SERVICE_ACCOUNT_TOKEN=$(cat ~/.config/1password/token) op service-account ratelimit` shows the budget (Individual plan: 1,000 requests/day for all service accounts — fetch once per process start, never per call; cache shell env for 1 h)
 
 ### 7. Optional (depends on server role)
 - [ ] Docker installed and running (if this server will run containers)
