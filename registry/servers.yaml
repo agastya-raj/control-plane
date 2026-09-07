@@ -105,7 +105,7 @@ servers:
       - caddy
       - ollama
       - jupyter
-      - doppler                          # Doppler CLI + service token at /etc/doppler/token
+      - 1password-cli                    # 1Password CLI + service-account token at /etc/1password/tokens/gpu-apps
 
     hardware:
       cpu: "13th Gen Intel Core i9-13900K"

@@ -117,7 +117,7 @@ apps:
     category: infra
     auth: none
 
-    notes: "Handles all *.sudosu.fyi routing. Config at /etc/caddy/Caddyfile, app routes at /etc/caddy/apps.caddy. Secrets via Doppler: systemd drop-in at /etc/systemd/system/caddy.service.d/doppler.conf refreshes /etc/caddy/env from personal_keys/prd on start. Currently has placeholder routes for grafana, jellyfin, hass, portainer on other servers."
+    notes: "Handles all *.sudosu.fyi routing. Config at /etc/caddy/Caddyfile, app routes at /etc/caddy/apps.caddy. Secrets via 1Password: systemd drop-in at /etc/systemd/system/caddy.service.d/doppler.conf refreshes /etc/caddy/env from 1Password vault personal_keys, item prd on start. Currently has placeholder routes for grafana, jellyfin, hass, portainer on other servers."
     added: "2026-03-25"
     last_verified: "2026-03-25"
 
