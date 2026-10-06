@@ -1,3 +1,8 @@
+---
+name: onboard-server
+description: Onboard an already-registered server into the control-plane infrastructure mesh over SSH — run install.sh, optionally set up Claude Code, Codex and Eternal Terminal, run the health check, and update registry/servers.yaml. Use when the user wants to onboard or set up a server in the mesh.
+---
+
 # /onboard-server — Full server onboarding guide
 
 Walk the user through onboarding a server into the infrastructure mesh. This skill adapts to each server's needs — not every server needs every step.
