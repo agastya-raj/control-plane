@@ -34,7 +34,7 @@ schema_version: 1
 #     category: infra                   # infra | research | tools | project | personal
 #                                       #   infra: control-plane, compute-bridge, custom_domain
 #                                       #   research: papers, experiments, models
-#                                       #   tools: knowledge_framework, symphony, dotfiles
+#                                       #   tools: knowledge_framework, dotfiles
 #                                       #   project: deployed apps with their own repos
 #                                       #   personal: side projects, misc
 #     status: active                    # active | archived | stale

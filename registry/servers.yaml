@@ -51,7 +51,6 @@ schema_version: 1
 #       - jupyter                       # Jupyter notebook server
 #       - tailscale                     # Tailscale connected (should be all)
 #       - claude_code                   # Claude Code installed
-#       - symphony                      # Symphony orchestration installed
 #       - et                            # Eternal Terminal installed
 #
 #     # ── Hardware (optional, but recommended) ───────────────────────────────

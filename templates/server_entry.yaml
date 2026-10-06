@@ -39,7 +39,6 @@
     # - ollama
     # - jupyter
     # - claude_code
-    # - symphony
     # - et
 
   # ── Hardware (fill from audit) ──

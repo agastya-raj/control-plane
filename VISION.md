@@ -29,11 +29,6 @@ Built compute-bridge (MCP server for SSH-based remote execution) as the transpor
 │  Research context, architecture decisions,        │
 │  lessons learned. Full clone on all servers.      │
 ├─────────────────────────────────────────────────┤
-│  Project Layer (WHAT)                            │
-│  ~/.stack/symphony/                              │
-│  Planning, PR workflow, code review, Linear sync. │
-│  Runs on all servers with Claude Code.            │
-├─────────────────────────────────────────────────┤
 │  Infrastructure Layer (WHERE/HOW)                │
 │  ~/.stack/infra/                                 │
 │  Server/app/repo registry, deploy protocols,      │
@@ -46,7 +41,7 @@ Built compute-bridge (MCP server for SSH-based remote execution) as the transpor
 └─────────────────────────────────────────────────┘
 ```
 
-**Flow:** Knowledge tells agents *why*. Symphony tells them *what* to build. Control-plane tells them *where* things run and *how* to deploy. Compute-bridge *does* the remote execution.
+**Flow:** Knowledge tells agents *why*. Control-plane tells them *where* things run and *how* to deploy. Compute-bridge *does* the remote execution.
 
 ### Layer Entry Points
 
@@ -55,7 +50,6 @@ Each layer has a single discoverable entry-point document that gives agents inst
 | Layer | Path | Entry-point | Purpose |
 |-------|------|------------|---------|
 | Infrastructure | `~/.stack/infra/` | `infra.md` | Registry structure, protocols, conventions, common tasks |
-| Project | `~/.stack/symphony/` | `SYMPHONY.md` (per-project) | Orchestration config, scale, review patterns |
 | Knowledge | `~/.stack/knowledge/` | TBD | Knowledge base structure, how to search/capture/curate |
 | Transport | `~/.stack/transport/` | TBD | Available tools, server config, transport options |
 
@@ -83,14 +77,6 @@ Each entry-point doc answers: what is this layer, why does it exist, where are t
 - Tailscale-only access
 - Will be extended as the status hub (Phase 4)
 
-### Symphony ✅ (built, running on Mac)
-- Currently at ~/.symphony/ (target: ~/.stack/symphony/)
-- Dev orchestration: planning, PR creation, code review, Linear sync
-- Cron-based Codex reviews, tech debt scanning
-- Session hooks for Claude Code
-- Scale-aware policies (small/medium/large)
-- To be deployed on all servers (future phase)
-
 ### knowledge_framework ✅ (exists, needs integration)
 - Currently at ~/ad_hoc/knowledge_framework (target: ~/.stack/knowledge/)
 - Captures research context, architecture decisions, lessons learned
@@ -101,7 +87,7 @@ Each entry-point doc answers: what is this layer, why does it exist, where are t
 
 | Server | SSH Alias | Role | Key Services | Status |
 |--------|-----------|------|-------------|--------|
-| Mac (local) | — | Primary dev, orchestration | Symphony, compute-bridge | Active |
+| Mac (local) | — | Primary dev | compute-bridge | Active |
 | GPU workstation | gpu | Compute, homelab services | custom_domain, Caddy, Docker apps | Active |
 | Open Ireland OL2 | ol2 | Testbed | Optical experiments | Active |
 | Open Ireland OL4 | ol4 | Testbed, telemetry | Grafana dashboards, Kafka | Active |
@@ -180,7 +166,6 @@ All connected via Tailscale.
 - Changelog mechanism:
   - git log-based (structured commit messages)
   - Session briefing parses recent commits
-- Integration with Symphony session hooks (compose, don't duplicate)
 
 **Verification:**
 - Register a new app using /register-app skill on Mac
@@ -266,11 +251,6 @@ All connected via Tailscale.
   - server_add writes to control-plane registry
   - Capability matching: "find a server with GPU and 20GB free VRAM"
   - Optional ET transport for long sessions
-- Symphony on all servers:
-  - Install on GPU + testbed servers
-  - Shared Symphony config synced via control-plane
-  - Cross-server project visibility
-  - Post-merge hook triggers deploy via control-plane protocol
 - Knowledge framework:
   - Clone to all servers via same cron sync
   - Agent orientation includes "check knowledge base for project context"
@@ -279,7 +259,6 @@ All connected via Tailscale.
 
 **Verification:**
 - Add a server via control-plane → compute-bridge immediately sees it
-- Start a Symphony project on GPU → visible from Mac dashboard
 - Create a knowledge entry on Mac → readable on GPU next session
 
 ---
@@ -421,7 +400,7 @@ Not all Claude Code config should sync — but the essentials should be consiste
 
 **What stays local (NOT synced):**
 - MCP server registrations (server-specific)
-- Hooks (Symphony hooks only on Mac, others vary)
+- Hooks (vary per server)
 - Session state, conversation history
 - Plugin configs
 

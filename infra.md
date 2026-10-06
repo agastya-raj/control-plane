@@ -90,7 +90,6 @@ This repo is one layer of a 4-layer stack. Target layout (all layers under `~/.s
 | Layer | Target Path | Current Location | Purpose |
 |-------|-------------|-----------------|---------|
 | Knowledge | `~/.stack/knowledge/` | `~/ad_hoc/knowledge_framework` | Research context, architecture decisions, lessons learned |
-| Project | `~/.stack/symphony/` | `~/.symphony/` | Planning, PR workflow, code review, Linear sync |
 | **Infrastructure** | **`~/.stack/infra/`** | **`~/code/control-plane`** | **Server/app/repo registry, protocols, sync** |
 | Transport | `~/.stack/transport/` | `~/code/compute-bridge` | Remote execution via SSH (16 MCP tools) |
 
